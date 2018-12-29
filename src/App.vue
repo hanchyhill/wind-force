@@ -30,6 +30,9 @@
       <Col span="2">
         <Button @click="convert2pdf" type="info">导出pdf</Button>
       </Col>
+      <Col span="2">
+        <Button @click="readFromFile" type="primary">读取本地</Button>
+      </Col>
       <Input v-model="desEN" type="textarea" placeholder="英文天气描述" />
       <Input v-model="desTY" type="textarea" placeholder="英文台风描述" />
   </Row>
@@ -38,57 +41,63 @@
       <Button @click="drawData" type="info">1713天鸽</Button>
       <Button @click="drawData" type="info">59488</Button>
     </Row>-->
-    <div id="main-content">
-    <div class="header" @click="showControl=!showControl">
-      <hr>
-      <img src="/logocact.gif" id="logo">
-      METEOROLOGICAL SERVICE CO. OF SCSOJSC GUANGDONG METEOROLOGICAL OBSERVATORY<br>
-      GUANGDONG METEOROLOGICAL OBSERVATORY NO.6 FUJIN ROAD YUEXIU, GUANGZHOU<br>
-      GUANGDONG, CHINA 510080 PHONE: +86 20 87751755 EMAIL: nymsc@tom.com<br>
-      <div class="email-to">
-      TO: ENI CHINA B.V.<br>
-      ATTN: Mr. OPERATIONS MANAGER<br>
-      Subject: MARINE WEATHER FORECAST FOR LOCATION HZ25-10-1<br>
-      21°15'15''N 115°09'33''E<br>
-      Base Time: {{localTime[0]}}; Issued Time: {{localTime[1]}}<br>
-      </div>
-      <hr>
-    </div>
-    <div class="header a4-paper">
-      <div class="description" v-show="desEN">
-        <br>
-        Dominant weather situation:<br>
-        {{desEN}}
-        <br>
-      </div>
-      <div class="description" v-show="desTY">
-        <br>
-        TC WARNING:<br>
-        {{desTY}}
-        <br>
-      </div>
-    </div>
-
-    <div class="a4-paper" contenteditable="true">
-      <h2>Elemental Forecast</h2>
-      <Table :columns="columns1" :data="tableData" :border="true" :stripe="true" :size="'small'"></Table>
-      &nbsp;<hr>
-    </div>
-    <div class="a4-paper">
-    <Row>
-      <Col span="20">
-        <!--<div id="e-chart" style="width: 1000px;height:400px;">
-        </div>-->
-        <div id="e-chart2" style="width: 20cm;height:350px;">
+    <div id="main-content" contenteditable="true">
+    <div class="page-frame">
+      <div class="header" @click="showControl=!showControl">
+        <hr>
+        <img src="/logocact.gif" id="logo">
+        METEOROLOGICAL SERVICE CO. OF SCSOJSC GUANGDONG METEOROLOGICAL OBSERVATORY<br>
+        GUANGDONG METEOROLOGICAL OBSERVATORY NO.6 FUJIN ROAD YUEXIU, GUANGZHOU<br>
+        GUANGDONG, CHINA 510080 PHONE: +86 20 87751755 EMAIL: nymsc@tom.com<br>
+        <div class="email-to">
+        TO: ENI CHINA B.V.; ATTN: Mr. OPERATIONS MANAGER<br>
+        Subject: MARINE WEATHER FORECAST FOR LOCATION HZ25-10-1<br>
+        <!--21°15'15''N 115°09'33''E<br>-->
+        Base Time: {{localTime[0]}}; Issued Time: {{localTime[1]}}<br>
         </div>
-        <br>
-        <div id="e-chart3" style="width: 20cm;height:350px;">
+        <hr>
+      </div>
+      <div class="align-left a4-paper" >
+        <div class="description" v-show="desEN">
+          Dominant weather situation:<br>
+          {{desEN}}
+          <br>
         </div>
-      </Col>
-      <Col span="2">&nbsp;</Col>
+        <div class="description" v-show="desTY">
+          <br>
+          TC WARNING:<br>
+          {{desTY}}
+          <br>
+        </div>
+      </div>
+      <div class="a4-paper" contenteditable="true">
+        <h2>Elemental Forecast</h2>
+        <Table :columns="columns1" :data="tableData" :border="true" :stripe="true" :size="'small'"></Table>
+        &nbsp;
+        <hr>
+      </div>
+    </div>
+    <div class="a4-paper page-frame">
+      <Row>
+        <Col span="20">
+          <!--<div id="e-chart" style="width: 1000px;height:400px;">
+          </div>-->
+          <div id="e-chart2" style="width: 20cm;height:350px;">
+          </div>
+          <br>
+          <div id="e-chart3" style="width: 20cm;height:350px;">
+          </div>
+          <br>
+        </Col>
+        <Col span="2">&nbsp;</Col>
+        
+      </Row>
+    </div>
+    <div class="a4-paper page-frame">
+      <h2>Weather Chart</h2>
+      <br>
       <img style="width: 14cm;" :src="imgTime[0]"></img>
       <img style="width: 14cm;" :src="imgTime[1]"></img>
-    </Row>
     </div>
     </div>
   </div>
@@ -104,7 +113,7 @@
   // console.log(waveCfg);
   var arrowSize = 12;
   function findWindWave(knots){
-    let intKnots = Math.ceil(knots)//向上取整;
+    // let intKnots = Math.ceil(knots)//向上取整;
     let fitItem;
     for(let item of waveCfg){
       if(Math.abs(Number.parseInt(item.Knot)-knots)<=0.5){
@@ -179,8 +188,8 @@
         fitHour = '06:00:00';
       }
       else{
-
-      };
+        '';
+      }
       console.log(fitDate,fitHour);
       return {
         showControl: false,
@@ -194,8 +203,14 @@
         columns1: [
           {
             title: 'Date',
-            key: 'tableDate',
-            "width": 80,
+            //key: 'tableDate',
+            children:[
+              {
+                title: 'MM-DD HH',
+                key: 'tableDate',
+                 "width": 80,
+                //"width": 70,
+              }],
           },
           {
             title:'WINDS(KTS)',
@@ -363,7 +378,9 @@
     },
     mounted() {
       //this.getWind();
-      this.searchData();
+      //this.searchData();
+      this.readFromFile();
+      this.changeTitle();
     },
     beforeDestroy() {
 
@@ -374,7 +391,7 @@
         const timeString = this.initTime+' '+this.fcHour;//'2017-08-22 12:00:00';
         let iTime = moment(timeString,'YYYY-MM-DD HH:mm:ss').add(8,'hours');
         this.speed.forEach(v=>v.time=moment(iTime).add(v.time,'hours').format('DD-HH'));
-        const ySeries = this.speed.map(v=>v.speed);
+        //const ySeries = this.speed.map(v=>v.speed);
         const xTime = this.speed.map(v=>v.time);
         const ws50m = this.tableData.map(v=>v.ws50m);
         const wg50m = this.tableData.map(v=>v.wg50m);
@@ -487,18 +504,18 @@
       },
       drawData3(){
         console.log(this.initTime+' '+this.fcHour);
-        const timeString = this.initTime+' '+this.fcHour;//'2017-08-22 12:00:00';
-        let iTime = moment(timeString,'YYYY-MM-DD HH:mm:ss').add(8,'hours');
+        // const timeString = this.initTime+' '+this.fcHour;//'2017-08-22 12:00:00';
+        // let iTime = moment(timeString,'YYYY-MM-DD HH:mm:ss').add(8,'hours');
         // this.speed.forEach(v=>v.time=moment(iTime).add(v.time,'hours').format('DD-HH'));
-        const ySeries = this.speed.map(v=>v.speed);
+        //const ySeries = this.speed.map(v=>v.speed);
         const xTime = this.tableData.map(v=>v.fTime.format('DD-HH'));
         const hs = this.tableData.map(v=>v.hs);
         const hmax = this.tableData.map(v=>v.hmax);
         const swellH = this.tableData.map(v=>v.swellH);
         const waveT = this.tableData.map(v=>v.waveT);
-        const mixWave = this.tableData.map(v=>v.mixWave);
+        //const mixWave = this.tableData.map(v=>v.mixWave);
         
-        const swellArrow = this.tableData.map(v=>v.swellArrow);
+        //const swellArrow = this.tableData.map(v=>v.swellArrow);
         //const knots = this.tableData.map(v=>v.knots);
         const maxValue = Math.max(...hmax);
         const data = this.tableData.map((v,i)=>[v.hmax,this.speed[i].time,v.swellRotation,i,maxValue]);
@@ -615,6 +632,25 @@
         };
         myChart.setOption(option);
       },
+      readFromFile(){
+        axios.get('/api?interface=getFromFile')
+        .then(res=>{
+          let data = res.data;
+          this.v10m = data.v10m;
+          this.u10m = data.u10m;
+          this.vis = data.vis;
+          this.t2m = data.t2m;
+          this.drawData2();
+          this.drawData3();
+        })
+        .catch(err=>console.error(err));
+
+        let sDate = this.initTime;
+        let sTime = this.fcHour;
+        let desTime = moment(sDate+sTime,'YYYY-MM-DDHH:mm:ss').add(8,'hours').format('YYYYMMDDHHmm');
+        console.log(desTime);
+        this.getDes(desTime);
+      },
       searchData(){
         let sDate = this.initTime;
         let sTime = this.fcHour;
@@ -628,6 +664,9 @@
         let urlVIS = `/api?interface=getWind&element=visi&${params}`;
         let urlT2m = `/api?interface=getWind&element=t2mm&${params}`;
         this.getWind(urlU,urlV,urlVIS,urlT2m);
+        let desTime = moment(sDate+sTime,'YYYY-MM-DDHH:mm:ss').add(8,'hours').format('YYYYMMDDHHmm');
+        console.log(desTime);
+        this.getDes(desTime);
       },
       getWind(url01='/u10.json',url02='/v10.json',url03='/v10.json',url04='/u10.json'){
         axios.all([axios.get(url01), axios.get(url02),axios.get(url03), axios.get(url04)])
@@ -656,16 +695,37 @@
           console.log(error);
         });
       },
+      getDes(dateString='201812270800'){
+        axios.get('/api?interface=getDes&dateString='+dateString)
+        .then(res=>{
+          let desString = res.data;
+          this.desTY = desString.tyString;
+          this.desEN = desString.enString;
+        })
+        .catch(err=>{
+          console.error(err)
+        })
+      },
       changeDate(date){
         this.initTime = date;
         console.log(date);
       },
       convert2pdf(){
-        html2pdf()(document.getElementById('e-chart2'), {
+        axios.get('/api?interface=convert2pdf')
+        .then(res=>{
+          console.log(res.data);
+        })
+        .catch(err=>{
+          console.error(err);
+        })
+/*         html2pdf()(document.getElementById('e-chart2'), {
         filename: 'test.pdf',
         margin: 10,
         smart: true // true: Smartly adjust content width
-        }, () => { console.log('finish!'); });
+        }, () => { console.log('finish!'); }); */
+      },
+      changeTitle(){
+        document.title = `GDMO ${this.initTime} ${this.fcHour} HZ25-10-1`;
       }
     },
     computed:{
@@ -697,11 +757,14 @@
           let iR = Math.sign(v10)*Math.acos(u10/iSpeed);
           let arrowR = iR - Math.PI/2;
           let iknots = iSpeed * 1.944;
-          let windDir = iR + Math.PI;
-          if(windDir<0) winDir = winDir + Math.PI*2;
+          let windDir = iR + Math.PI;//风的来向
+          windDir = -(windDir - Math.PI/2);//与北向的角度差
+          if(windDir<0){
+            windDir = windDir + Math.PI*2;
+          }
           let dir = windDir/Math.PI*180;
           if(dir>360) dir = dir - 360;
-          let wind10m = this.v10m[i][0];
+          // let wind10m = this.v10m[i][0];
           let waveFit = findWindWave(iknots);
           
           let iTime = fTime.format('MM-DD HH');
@@ -718,6 +781,7 @@
           if(swellDir>360) swellDir = swellDir - 360;
           //if(waveDir)
           let colo = {
+            windDir:windDir*180/Math.PI,
             interval: this.v10m[i][1],
             tableDate: iTime,
             dir: dir.toFixed(0),
@@ -771,8 +835,17 @@
                      moment(p2Time).format('YYYYMMDDHH') + 
                      '0000000.jpg';
         return [p2Src, p1Src];
-      }
+      },
+      
     },
+    watch:{
+      initTime(){
+        this.changeTitle();
+      },
+      fcHour(){
+        this.changeTitle();
+      }
+    }
   };
 </script>
 <style>
@@ -816,7 +889,15 @@
 }
 .ivu-table-header{
   font-size: 13px;
+  overflow: visible !important;
+  text-overflow:clip !important;
+  min-width: 120px !important;
 }
+
+.ivu-table-header .ivu-table-cell{
+  white-space: nowrap !important;
+} 
+
 .ivu-table-cell{
   padding-left: 3px !important;
   padding-right: 3px !important;
@@ -825,7 +906,7 @@
 #logo{
   position: absolute;
   float:left;
-  left:15cm;
+  left:17cm;
 }
 .email-to{
   color:red;
@@ -833,12 +914,24 @@
   text-align: left;
 }
 td{
-  height:27px !important;
+  height:25px !important;
+
+}
+th, th{
+  overflow: visible !important;
+  word-wrap:break-word !important;
 }
 body{
   width:23cm;
 }
 h2{
   text-align: left;
+}
+.align-left{
+  text-align:left;
+}
+.page-frame{
+  page-break-after: always;
+  page-break-inside: avoid;
 }
 </style>
