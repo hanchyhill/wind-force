@@ -35,6 +35,8 @@
       </Col>
       <Input v-model="desEN" type="textarea" placeholder="英文天气描述" />
       <Input v-model="desTY" type="textarea" placeholder="英文台风描述" />
+      <Input v-model="galeWarning" type="textarea" placeholder="Gale Warning" />
+      
   </Row>
     <!--<Row>
       <Button @click="drawData" type="info">1714帕卡</Button>
@@ -59,7 +61,7 @@
       </div>
       <div class="align-left a4-paper" >
         <div class="description" v-show="desEN">
-          Dominant weather situation:<br>
+          Dominant Weather Situation:<br>
           {{desEN}}
           <br>
         </div>
@@ -67,6 +69,12 @@
           <br>
           TC WARNING:<br>
           {{desTY}}
+          <br>
+        </div>
+        <div class="description galeWarning" v-show="galeWarning">
+          <br>
+          Gale Warning:<br>
+          {{galeWarning}}
           <br>
         </div>
       </div>
@@ -194,12 +202,14 @@
       return {
         showControl: false,
         isCollapsed: true,
+        isShift: true,
         u10m:[],
         v10m:[],
         t2m:[],
         vis:[],
         desEN:'',
         desTY:'',
+        galeWarning:'',
         columns1: [
           {
             title: 'Date',
@@ -209,6 +219,7 @@
                 title: 'MM-DD HH',
                 key: 'tableDate',
                  "width": 80,
+                align: 'center',
                 //"width": 70,
               }],
           },
@@ -219,94 +230,87 @@
               {
                 title: 'Dir',
                 key: 'dir',
+                align: 'center',
                 //"width": 70,
               },
               {
                 title: 'Ws',
+                align: 'center',
                 children:[
                   {
                     title:'10m',
                     key: 'knots',
+                    align: 'center',
+                    
                   }
                 ],
               },
               {
                 title: 'Ws',
+                align: 'center',
                 children:[
                   {
                     title:'50m',
                     key: 'ws50m',
+                    align: 'center',
                   }
                 ],
               },
               {
                 title: 'Wg',
+                align: 'center',
                 children:[
                   {
                     title:'50m',
                     key: 'wg50m',
+                    align: 'center',
                   }
                 ],
               },
               {
                 title: 'Ws',
+                align: 'center',
                 children:[
                   {
                     title:'100m',
                     key: 'ws100m',
+                    align: 'center',
                   }
                 ],
               },
               {
                 title: 'Wg',
+                align: 'center',
                 children:[
                   {
                     title:'100m',
                     key: 'wg100m',
+                    align: 'center',
                   }
                 ],
               },
               ],
           },
-/*           {
-            title:'TOTAL SEA',
-            align: 'center',
-            children:[
-              {
-                title: 'Hs',//有效波高
-                key: 'hs'
-              },
-              {
-                title: 'Hmax',
-                key: 'hmax'
-              },
-              {
-                title: 'Tz',
-                key: 'tz'
-              },
-            ],
-          }, */
           {
             title:'WIND WAVES (M)',
             align: 'center',
             children:[
-              // {
-              //   title: 'Dir',
-              //   key: 'waveDir'
-              // },
               {
                 title: 'Hs',
-                width:30,
-                key: 'waveH'
+                width:32,
+                key: 'waveH',
+                align: 'center',
               },
               {
                 title: 'Hmax',
                 width:45,
-                key: 'hmax'
+                key: 'hmax',
+                align: 'center',
               },
               {
                 title: 'PER',
-                key: 'waveT'
+                key: 'waveT',
+                align: 'center',
               },
             ],
           },
@@ -316,15 +320,18 @@
             children:[
               {
                 title: 'Dir',
-                key: 'swellDir'
+                key: 'swellDir',
+                align: 'center',
               },
               {
                 title: 'H',
-                key: 'swellH'
+                key: 'swellH',
+                align: 'center',
               },
               {
                 title: 'PER',
                 key: 'swellT',
+                align: 'center',
                 //"width": 70,
               },
             ],
@@ -336,7 +343,8 @@
               {
                 title: 'HT',
                 width:48,
-                key: 'mixWave'
+                key: 'mixWave',
+                align: 'center',
               },
             ],
           },
@@ -346,11 +354,13 @@
             children:[
               {
                 title: 'T2m',
-                key: 't2m'
+                key: 't2m',
+                align: 'center',
               },
               {
                 title: 'VIS',
                 key: 'vis',
+                align: 'center',
                 //"width": 70,
               },
             ]
@@ -361,8 +371,8 @@
                    {label:'14',value:'06:00:00'},
                    {label:'20',value:'12:00:00'},
                   ],
-        lon:115.1,
-        lat:21.1,
+        lon:115.2,
+        lat:21.3,
         initTime:fitDate,//'2018-12-26',
         selectedModel:'giftoceanzd',
         modelList:[{label:'GIFT海洋',value:'giftoceanzd'},
@@ -632,14 +642,28 @@
         };
         myChart.setOption(option);
       },
+      shiftData(arr){
+        arr.shift();
+        return arr.map(item=>[item[0],item[1]-6]);
+      },
       readFromFile(){
         axios.get('/api?interface=getFromFile')
         .then(res=>{
           let data = res.data;
-          this.v10m = data.v10m;
-          this.u10m = data.u10m;
-          this.vis = data.vis;
-          this.t2m = data.t2m;
+          if(this.isShift){
+            this.v10m = this.shiftData(data.v10m);
+            this.u10m = this.shiftData(data.u10m);
+            this.vis = this.shiftData(data.vis);
+            this.t2m = this.shiftData(data.t2m);
+            
+          }else{
+            this.v10m = data.v10m;
+            this.u10m = data.u10m;
+            this.vis = data.vis;
+            this.t2m = data.t2m;
+          }
+          console.log(this.getGaleWarning());
+          this.galeWarning = this.getGaleWarning();
           this.drawData2();
           this.drawData3();
         })
@@ -683,13 +707,21 @@
           return [U,V,VIS,T]
         }))
         .then(([U,V,VIS,T])=>{
-          this.u10m = U;
-          this.v10m = V;
-          this.vis = VIS;
-          this.t2m = T;
+          if(this.isShift){
+            this.u10m = this.shiftData(U);
+            this.v10m = this.shiftData(V);
+            this.vis = this.shiftData(VIS);
+            this.t2m = this.shiftData(T);
+          }else{
+            this.u10m = U;
+            this.v10m = V;
+            this.vis = VIS;
+            this.t2m = T;
+          }
           // this.drawData();
           this.drawData2();
           this.drawData3();
+          this.galeWarning = this.getGaleWarning();
         })
         .catch(function (error) {
           console.log(error);
@@ -726,7 +758,39 @@
       },
       changeTitle(){
         document.title = `GDMO ${this.initTime} ${this.fcHour} HZ25-10-1`;
-      }
+      },
+      getGaleWarning(){
+        
+        
+        if(!this.tableData.length||this.tableData.length<6) return '';
+        let data = this.tableData.slice(0,6);
+        let config={
+          trigger:false,
+          count:0,
+          init:undefined,
+          index:undefined,
+        }
+        config = data.reduce((config,cv,ci)=>{
+          if(cv.iknots>30&&config.trigger==false){
+            config.count += 1;
+            if(config.count===1){
+              config.init = cv;
+              config.index= ci;
+            }
+            if(config.count===2){
+              config.trigger = true;
+            }
+          }
+          return config;
+        },config);
+        // console.log(config);
+        if(config.trigger){
+           return `WIND SPEED OVER ${config.init.iknots.toFixed(0)} KTS GUST ${findWindWave(config.init.iknots).GustKnots} KTS NEAR YOUR WELL SITE FORM ${config.init.tableDate}:00 L.T.`;
+        }else{
+          return '';
+        }
+      
+      },
     },
     computed:{
       speed(){
@@ -803,7 +867,7 @@
             swellH: waveFit?waveFit.SurgeHeight:'',
             swellT: waveFit?waveFit.SurgePeriod:'',
             mixWave: waveFit?waveFit.MixWave:'',
-            t2m:this.t2m[i][0].toFixed(1),
+            t2m:this.t2m[i][0].toFixed(0),
             vis:this.vis[i][0]==0?10:this.vis[i][0].toFixed(0),
             swellArrow:swellDir - 90,
             swellRotation:arrowR - 15.0/180.0*Math.PI,
@@ -836,7 +900,6 @@
                      '0000000.jpg';
         return [p2Src, p1Src];
       },
-      
     },
     watch:{
       initTime(){
@@ -934,4 +997,8 @@ h2{
   page-break-after: always;
   page-break-inside: avoid;
 }
+.galeWarning{
+  color:red;
+}
+
 </style>
