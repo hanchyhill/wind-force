@@ -4,6 +4,7 @@ const moment = require('moment');
 const path = require("path");
 const util = require('util');
 const { spawn } = require('child_process');
+const ejsHTML = require("./ejs-generator-promise.js").ejsHTML;
 
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
@@ -76,6 +77,7 @@ async function main (timeConfig=getTime()) {
   try{
     //const timeConfig = getTime();
     const fileName = `HZ25-10-1-${timeConfig.fileTime}.pdf`;
+    const imgName = `ENI${timeConfig.fileTime}.jpg`;
     const pdfConfig = {
       //displayHeaderFooter: true,
       // headerTemplate: '<p class="pageNumber">GDMO</p>',
@@ -104,22 +106,56 @@ async function main (timeConfig=getTime()) {
     //   { color: { r: 0, g: 0, b: 0, a: 0 } }
     // );
     await page.setViewport({
-      width: 1024,
+      width: 900,//1024,
       height: 768,
     });
     await timeout(6000);
-    await page.screenshot({path: 'example.png'});
     console.log('正在生成PDF '+fileName);
     await page.pdf(pdfConfig);
+    
+    await page.screenshot({path: path.resolve(__dirname,'html/'+imgName),fullPage: true});
+    await page.screenshot({path: path.resolve(__dirname,'html/ENI.jpg'),fullPage: true});
+    //await page.screenshot({path: path.resolve(__dirname,`html/ENI${timeConfig.fileTime}.jpg`),fullPage: true});
+    
+    ejsHTML({imgSrc:'ENI.jpg'})
+    .then(html=>{
+      fs.writeFile(path.resolve(__dirname,'html/ENI.html'), html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    ejsHTML({imgSrc:`ENI${timeConfig.fileTime}.jpg`})
+    .then(html=>{
+      fs.writeFile(path.resolve(__dirname,`html/ENI${timeConfig.fileTime}.html`), html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    //外链
     pdfConfig.path = '//10.148.16.32/e/ssow/email/'+fileName;
-    await page.pdf(pdfConfig);
+     await page.pdf(pdfConfig);
+    
     console.log('PDF生成完成');
+    console.log('正在生成HTML '+imgName);
+    await page.screenshot({path: '//10.148.16.32/e/ssow/html/'+imgName,fullPage: true});
+    await page.screenshot({path:  '//10.148.16.32/e/ssow/html/'+'ENI.jpg',fullPage: true});
+    ejsHTML({imgSrc:'ENI.jpg'})
+    .then(html=>{
+      fs.writeFile('//10.148.16.32/e/ssow/html/'+`ENI.html`, html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    ejsHTML({imgSrc:imgName})
+    .then(html=>{
+      fs.writeFile('//10.148.16.32/e/ssow/html/'+`ENI${timeConfig.fileTime}.html`, html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    
     let openDir = path.dirname(path.resolve(__dirname,'pdf/'+fileName));
     console.log(openDir);
     spawn('explorer.exe', [openDir]);
-    // openDir = path.dirname('\\\\10.148.16.32\\e\\ssow\\email\\'+fileName);
     spawn('explorer.exe', ['\\\\10.148.16.32\\e\\ssow\\email\\']);
-    console.log('打开资源管理器');
+    console.log('打开资源管理器'); 
+    
     await browser.close();
   }
   catch(err){

@@ -84,8 +84,8 @@ function getTime(){
     timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
   }
   else if(nowHour<14&&nowHour>=9){
-    fitHour = '06:00:00';
-    fitDate = nowDate.hour(6);
+    fitHour = '00:00:00'//'06:00:00';
+    fitDate = nowDate.hour(0);//(6);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
@@ -103,7 +103,7 @@ async function main(){
   console.log('下载数据量较大，处理数据需要几分钟，请不要关闭窗口');
   let nameList = ['t2mm','visi','u10m','v10m',];
   let suffix = ['000','006','012','018','024','030','036','042','048','054','060','066','072','078','084','090','096','102','108','114','120'];
-  let point = (194-1)*201+113-1;//192列,112行   21.3N 115.2E 194列,113行
+  let point = (194-1)*201+113-1;//   21.3N 115.2E 194列,113行
   let day = timeConfig.day//28//00 06 12 20 18
   let hour = timeConfig.hour//6;
   let time = (day-1)*4+hour/6+1;//
@@ -111,7 +111,7 @@ async function main(){
   let fileList = nameList.map(name=>name + '.nc');
   let varList = nameList.map(name=>suffix.map(v=>name+v));
   try{
-    console.log('正在读取');
+    console.log('正在读取文件夹 '+filePath);
     let dataAll = await Promise.all(nameList.map((v,i)=>{
       return readNC(filePath,fileList[i],point,varList[i],time);
     }));
