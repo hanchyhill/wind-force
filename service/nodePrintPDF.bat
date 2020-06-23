@@ -1,9 +1,9 @@
-cd D:\app\wind-force\service
+cd D:\app\wind-force-YJFD\service
 d:
 node printPDF.js
 echo off
 echo ******************************
-echo ENI单点预报已生成，请注意检查！
+echo 阳江风电单点预报已生成，请注意检查！
 echo ******************************
 echo 检查完毕请关闭本窗口
 echo ******************************

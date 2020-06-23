@@ -112,8 +112,8 @@ async function main (timeConfig=getTime()) {
       width: 900,//1024,
       height: 768,
     });
-    await timeout(10000);
-    console.log('喝杯茶，等待数据中心接口回传')
+    await timeout(20000);
+    console.log('喝杯茶，等待20秒数据中心接口回传')
     console.log('正在生成PDF '+fileName);
     await page.pdf(pdfConfig);
     // 外链
