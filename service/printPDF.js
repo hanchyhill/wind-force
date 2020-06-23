@@ -2,12 +2,12 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const moment = require('moment');
 const path = require("path");
-const util = require('util');
+// const util = require('util');
 const { spawn } = require('child_process');
 const ejsHTML = require("./ejs-generator-promise.js").ejsHTML;
 
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
+// const readFile = util.promisify(fs.readFile);
+// const writeFile = util.promisify(fs.writeFile);
 
 function timeout(delay) {
   return new Promise((resolve, reject) => {
@@ -68,6 +68,7 @@ function getTime(){
   else{
     '';
   }
+  timeConfig.fitHour = fitHour;
   return timeConfig;
 }
 
@@ -76,8 +77,10 @@ function getTime(){
 async function main (timeConfig=getTime()) {
   try{
     //const timeConfig = getTime();
-    const fileName = `HZ25-10-1-${timeConfig.fileTime}.pdf`;
-    const imgName = `ENI${timeConfig.fileTime}.jpg`;
+    const fitName = 'YJFD-nanpeng-hourly';
+    const fileName = `${fitName}-${timeConfig.fileTime}.pdf`;
+    const imgName = `${fitName}-${timeConfig.fileTime}.jpg`;
+    
     const pdfConfig = {
       //displayHeaderFooter: true,
       // headerTemplate: '<p class="pageNumber">GDMO</p>',
@@ -112,40 +115,45 @@ async function main (timeConfig=getTime()) {
     await timeout(6000);
     console.log('正在生成PDF '+fileName);
     await page.pdf(pdfConfig);
-    
+    // 外链
+    pdfConfig.path = '//10.148.16.32/e/ssow/email/'+fileName;
+    await page.pdf(pdfConfig);
+    console.log('PDF生成完成');
+
+    // await page.setViewport({
+    //   width: 1920, height: 1080,
+    // });
+    console.log('正在生成HTML '+imgName);
+
     await page.screenshot({path: path.resolve(__dirname,'html/'+imgName),fullPage: true});
-    await page.screenshot({path: path.resolve(__dirname,'html/ENI.jpg'),fullPage: true});
+    await page.screenshot({path: path.resolve(__dirname,'html/'+fitName+'.jpg'),fullPage: true});
     //await page.screenshot({path: path.resolve(__dirname,`html/ENI${timeConfig.fileTime}.jpg`),fullPage: true});
     
-    ejsHTML({imgSrc:'ENI.jpg'})
+    ejsHTML({imgSrc:fitName+'.jpg'})
     .then(html=>{
-      fs.writeFile(path.resolve(__dirname,'html/ENI.html'), html, (err)=>{if (err) {
-        return console.error(err);
-      }});
-    });
-    ejsHTML({imgSrc:`ENI${timeConfig.fileTime}.jpg`})
-    .then(html=>{
-      fs.writeFile(path.resolve(__dirname,`html/ENI${timeConfig.fileTime}.html`), html, (err)=>{if (err) {
-        return console.error(err);
-      }});
-    });
-    //外链
-    pdfConfig.path = '//10.148.16.32/e/ssow/email/'+fileName;
-     await page.pdf(pdfConfig);
-    
-    console.log('PDF生成完成');
-    console.log('正在生成HTML '+imgName);
-    await page.screenshot({path: '//10.148.16.32/e/ssow/html/'+imgName,fullPage: true});
-    await page.screenshot({path:  '//10.148.16.32/e/ssow/html/'+'ENI.jpg',fullPage: true});
-    ejsHTML({imgSrc:'ENI.jpg'})
-    .then(html=>{
-      fs.writeFile('//10.148.16.32/e/ssow/html/'+`ENI.html`, html, (err)=>{if (err) {
+      fs.writeFile(path.resolve(__dirname,'html/'+fitName+'.html'), html, (err)=>{if (err) {
         return console.error(err);
       }});
     });
     ejsHTML({imgSrc:imgName})
     .then(html=>{
-      fs.writeFile('//10.148.16.32/e/ssow/html/'+`ENI${timeConfig.fileTime}.html`, html, (err)=>{if (err) {
+      fs.writeFile(path.resolve(__dirname,`html/${fitName}${timeConfig.fileTime}.html`), html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    //外链
+
+    await page.screenshot({path: '//10.148.16.32/e/ssow/html/'+imgName,fullPage: true});
+    await page.screenshot({path:  '//10.148.16.32/e/ssow/html/'+fitName+'.jpg',fullPage: true});
+    ejsHTML({imgSrc:'fitName.jpg'})
+    .then(html=>{
+      fs.writeFile('//10.148.16.32/e/ssow/html/'+`${fitName}.html`, html, (err)=>{if (err) {
+        return console.error(err);
+      }});
+    });
+    ejsHTML({imgSrc:imgName})
+    .then(html=>{
+      fs.writeFile('//10.148.16.32/e/ssow/html/'+`${fitName}${timeConfig.fileTime}.html`, html, (err)=>{if (err) {
         return console.error(err);
       }});
     });
@@ -161,7 +169,7 @@ async function main (timeConfig=getTime()) {
   catch(err){
     throw err;
   }
-};
+}
 
 exports.printPDF = main;
 
