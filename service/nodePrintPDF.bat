@@ -1,5 +1,5 @@
-cd D:\app\wind-force-YJFD\service
 d:
+cd D:\app\wind-force-YJFD\service
 node printPDF.js
 echo off
 echo ******************************

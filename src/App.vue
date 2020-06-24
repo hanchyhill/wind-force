@@ -227,7 +227,7 @@ export default {
     } else if (nowHour < 14 && nowHour >= 9) {
       // 上午用昨天12时起报
       fitDate = moment(nowDate).hour(6).format("YYYY-MM-DD");
-      fitHour = "00:00:00"; //'06:00:00';
+      fitHour = "06:00:00"; //'06:00:00';
       modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
       modelFcHour = "12:00:00";
     } else {
@@ -1050,10 +1050,10 @@ export default {
     },
     localTime() {
       const timeString = this.initTime + " " + this.fcHour; //'2017-08-22 12:00:00';
-      let iTime = moment(timeString, "YYYY-MM-DD HH:mm:ss").add(8 - 6, "hours");
+      let iTime = moment(timeString, "YYYY-MM-DD HH:mm:ss").add(8, "hours");
       return [
         moment(iTime).format("北京时 YYYY年MM月DD日HH:mm"),
-        moment(iTime.add(2, "hours")).format("YYYY年MM月DD日HH:mm")
+        moment(iTime.add(1, "hours")).format("YYYY年MM月DD日HH:mm")
       ];
     },
     /**模式与预报时间的差值*/
