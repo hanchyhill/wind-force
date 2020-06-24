@@ -5,7 +5,7 @@ const path = require("path");
 // const util = require('util');
 const { spawn } = require('child_process');
 const ejsHTML = require("./ejs-generator-promise.js").ejsHTML;
-
+const axios = require('axios');
 // const readFile = util.promisify(fs.readFile);
 // const writeFile = util.promisify(fs.writeFile);
 
@@ -26,6 +26,7 @@ function getTime(){
   let nowHour = nowDate.hour();
   let fitDate;
   let fitHour;
+  let modelInitDate, modelFcHour;
   let timeConfig = {
     yearmonth:'201901',
     day:1,
@@ -35,46 +36,88 @@ function getTime(){
   //nowHour = 4;
   if(nowHour>=14&&nowHour<21){
     fitHour = '12:00:00';
-    fitDate = nowDate.hour(12);
+    fitDate = moment(nowDate).hour(12);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
     timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+    modelFcHour = "12:00:00";
   }
   else if(nowHour>=21){
     fitHour = '00:00:00';
-    fitDate = nowDate.add(1,'days').hour(0);
+    fitDate = moment(nowDate).add(1,'days').hour(0);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
     timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+    modelFcHour = "00:00:00";
   }
   else if(nowHour<9){
     fitHour = '00:00:00';
-    fitDate = nowDate.hour(0);
+    fitDate = moment(nowDate).hour(0);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
     timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+    modelFcHour = "12:00:00";
   }
   else if(nowHour<14&&nowHour>=9){
     fitHour = '06:00:00';
-    fitDate = nowDate.hour(6);
+    fitDate = moment(nowDate).hour(6);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
     timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+    modelFcHour = "12:00:00";
   }
   else{
     '';
   }
   timeConfig.fitHour = fitHour;
+  timeConfig.fitDate = fitDate;
+  timeConfig.modelInitDate = modelInitDate;
+  timeConfig.modelFcHour = modelFcHour;
+  timeConfig.initTime = fitDate;
+  timeConfig.lat = 21.5;
+  timeConfig.lon = 112.25;
+  timeConfig.selectedModel = "ecmwf_s2s";
+  timeConfig.fcHour = fitHour;
   return timeConfig;
 }
 
 
 
 async function main (timeConfig=getTime()) {
+  try{
+    let sDate = timeConfig.modelInitDate;
+    let sTime = timeConfig.modelFcHour;
+    // let fcHrLenth = moment(`${this.modelInitDate} `)
+    let eDate = moment(timeConfig.initTime, "YYYY-MM-DD")
+      .add(1, "days")
+      .format("YYYY-MM-DD");
+    let eTime = timeConfig.fcHour;
+    let iLon = timeConfig.lon;
+    let iLat = timeConfig.lat;
+    let iModel = timeConfig.selectedModel;
+    let params = `starttime=${sDate}%20${sTime}&endtime=${eDate}%20${eTime}&lon=${iLon}&lat=${iLat}&modelid=${iModel}`;
+    let urlGetHourlyFc = `http://localhost:8080/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`;
+    // const elems = ["u10m", "v10m", "t2mm", "visi", "tppm", "tcco"];
+    let res = await axios.get(urlGetHourlyFc);
+    let data = res.data;
+    if (data.DATA.length == 0) {
+
+      throw new Error('此时次模式数据为空,请等待更新');
+    }else{
+      console.log('数据中心数据接口测试完成，准备生成数据');
+    }
+  }catch(err){
+    console.log('数据中心数据接口异常，请注意是否有数据生成');
+    console.error(err);
+  }
   try{
     //const timeConfig = getTime();
     const fitName = 'YJFD-nanpeng-hourly';
