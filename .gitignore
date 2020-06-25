@@ -24,3 +24,4 @@ yarn-error.log*
 /service/html
 /service/pdf
 *.zip
+*.lock
