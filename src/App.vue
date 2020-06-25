@@ -354,7 +354,7 @@ export default {
             },
             {
               title: "能见度",
-              key: "vis",
+              key: "modVis",
               align: "center"
               //"width": 70,
             },
@@ -389,7 +389,24 @@ export default {
         ocbu_scmoc: { u10m: "u10m", v10m: "v10m" },
         ecmwfthin: { u10m: "u10m", v10m: "v10m" },
         ecmwf_s2s: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
-      }
+      },
+      visCompressRatio: new Map(
+        [19, 0.1],
+        [20, 0.2],
+        [21, 0.3],
+        [22, 0.4],
+        [23, 0.5],
+        [0, 0.55],
+        [1, 0.6],
+        [2, 0.65],
+        [3, 0.7],
+        [4, 0.75],
+        [5, 0.8],
+        [6, 0.6],
+        [7, 0.4],
+        [8, 0.3],
+        [9, 0.1],
+      ),
     };
   },
   mounted() {
@@ -487,37 +504,6 @@ export default {
             },
             data: wg10m
           },
-          // {
-          //   name: 'Wg50m',
-          //   type: 'line',
-          //   smooth: true,
-          //   symbol: 'rect',
-          //   symbolSize: 8,
-          //   lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
-          //   itemStyle: {normal: {borderWidth: 2,borderColor: 'green',color: 'green'}},
-          //   data: wg50m,
-          // },
-          // {
-          //   name: 'Ws100m',
-          //   type: 'line',
-          //   smooth: true,
-          //   symbol: 'diamond',
-          //   symbolSize: 8,
-          //   lineStyle: {normal: {width: 2,color:'orange'}},//type: 'dashed'
-          //   itemStyle: {normal: {borderWidth: 2,borderColor: 'orange',color: 'orange'}},
-          //   data: ws100m,
-          // },
-          // {
-          //   name: 'Wg100m',
-          //   type: 'line',
-          //   smooth: true,
-          //   symbol: 'circle',
-          //   symbolSize: 8,
-          //   //color:'orange',
-          //   lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
-          //   itemStyle: {normal: {borderWidth: 2,borderColor: 'red',color: 'red'}},
-          //   data: wg100m,
-          // },
           {
             type: "custom",
             name: "dir",
@@ -535,19 +521,12 @@ export default {
     },
     drawData3() {
       console.log(this.initTime + " " + this.fcHour);
-      // const timeString = this.initTime+' '+this.fcHour;//'2017-08-22 12:00:00';
-      // let iTime = moment(timeString,'YYYY-MM-DD HH:mm:ss').add(8,'hours');
-      // this.speed.forEach(v=>v.time=moment(iTime).add(v.time,'hours').format('DD-HH'));
-      //const ySeries = this.speed.map(v=>v.speed);
+
       const xTime = this.tableData.map(v => v.fTime.format("DD-HH"));
       const hs = this.tableData.map(v => v.hs);
       const hmax = this.tableData.map(v => v.hmax);
       const swellH = this.tableData.map(v => v.swellH);
       const waveT = this.tableData.map(v => v.waveT);
-      //const mixWave = this.tableData.map(v=>v.mixWave);
-
-      //const swellArrow = this.tableData.map(v=>v.swellArrow);
-      //const knots = this.tableData.map(v=>v.knots);
       const maxValue = Math.max(...hmax);
       const data = this.tableData.map((v, i) => [
         v.hmax,
@@ -556,9 +535,6 @@ export default {
         i,
         maxValue
       ]);
-
-      // console.log(this.speed);
-      //const myChart = echarts.init(document.getElementById('e-chart3'), null, {renderer: 'svg'});
       const myChart = echarts.init(document.getElementById("e-chart3"));
       var option = {
         title: {
@@ -596,10 +572,7 @@ export default {
             }
           }
         ],
-        //visualMap: {
-        //top: 10,
-        // right: 10,
-        //},
+
         series: [
           {
             name: "浪高",
@@ -728,14 +701,7 @@ export default {
       let iLat = this.lat;
       let iModel = this.selectedModel;
       let params = `starttime=${sDate}%20${sTime}&endtime=${eDate}%20${eTime}&lon=${iLon}&lat=${iLat}&modelid=${iModel}`;
-      // let urlU = `/api?interface=getWind&element=${this.modelParams[this.selectedModel].u10m}&${params}`;
-      // let urlV = `/api?interface=getWind&element=${this.modelParams[this.selectedModel].v10m}&${params}`;
-      // let urlVIS = `/api?interface=getWind&element=visi&${params}`;
-      // let urlT2m = `/api?interface=getWind&element=t2mm&${params}`;
-      // this.getWind(urlU,urlV,urlVIS,urlT2m);
       let urlGetHourlyFc = `/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`;
-      // TODO 自动探测所需预报时长
-      // TODO fix: 修正时间为预报时间
       this.getElemsHourly(urlGetHourlyFc);
       let desTime = moment(this.initTime + this.fcHour, "YYYY-MM-DDHH:mm:ss")
         .add(8, "hours")
@@ -948,7 +914,22 @@ export default {
       } else {
         return "";
       }
-    }
+    },
+    /**
+     * base, 压缩基准,小于base不压缩;
+     * ratio, 压缩比
+     */
+    Compressor(base=10.0, ratio=0.5){
+      return (input)=>{
+        let output = input;
+        if(input<base){
+          output = input;
+        }else{
+          output = base + (input - base)*(1-ratio);
+        }
+        return output;
+      }
+    },
   },
   computed: {
     speed() {
@@ -977,9 +958,13 @@ export default {
       // console.log('test');
       const timeString = this.initTime + " " + this.fcHour; //'2017-08-22 12:00:00';
       let startTime = moment(timeString, "YYYY-MM-DD HH:mm:ss").add(8, "hours");
-
+      let compressorsMap = new Map();
+      this.visCompressRatio.forEach((ratio, time)=>{
+        compressorsMap.set(time, this.Compressor(10, ratio));
+      });// 设置压缩比
       let data = this.v10m.map((v, i) => {
         let fTime = moment(startTime).add(this.v10m[i][1], "hours");
+        let fHour = fTime.hour();
         let u10 = this.u10m[i][0];
         let v10 = this.v10m[i][0];
         let rain = this.rainHr.length?this.rainHr[i][0]:0;
@@ -1000,6 +985,12 @@ export default {
         let waveFit = findWindWave(iknots);
 
         let iTime = fTime.format("MM-DD HH");
+        // TODO 修改能见度
+        let modVis = this.vis.length == 0 ? 0 : this.vis[i][0];
+        // 如果在晚上
+        if(fHour>19||fHour<9){
+          modVis = compressorsMap.get(fHour)(modVis);
+        }
         // let iV50 = iknots*Math.pow(5,0.12);
         // let fit50 = findWindWave(iV50);
 
@@ -1038,6 +1029,7 @@ export default {
           mixWave: waveFit ? waveFit.MixWave : "",
           t2m: this.t2m[i][0].toFixed(0),
           vis: this.vis[i][0] == 0 ? 0.2 : this.vis[i][0].toFixed(0),// 雾最小0.2
+          modVis,
           swellArrow: swellDir - 90,
           swellRotation: arrowR - (15.0 / 180.0) * Math.PI,
           rain,
