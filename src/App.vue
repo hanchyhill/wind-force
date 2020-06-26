@@ -390,7 +390,7 @@ export default {
         ecmwfthin: { u10m: "u10m", v10m: "v10m" },
         ecmwf_s2s: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
       },
-      visCompressRatio: new Map(
+      visCompressRatio: new Map([
         [19, 0.1],
         [20, 0.2],
         [21, 0.3],
@@ -405,7 +405,7 @@ export default {
         [6, 0.6],
         [7, 0.4],
         [8, 0.3],
-        [9, 0.1],
+        [9, 0.1],]
       ),
     };
   },
