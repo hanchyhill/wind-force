@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
+  <link rel="stylesheet" href="//unpkg.zhimg.com/view-design/dist/styles/iview.css">
+  <script src="//unpkg.zhimg.com/view-design/dist/iview.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
+  <style>
+    body {
+      font-family: "Arial", "Microsoft YaHei", "黑体", "STXihei", "华文细黑";
+    }
+  </style>
+  <style>
+    .header {
+      text-align: left;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    #app {
+      font-family: "Avenir", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-align: center;
+      color: #2c3e50;
+      margin-left: 10px;
+    }
+
+    #nav {
+      padding: 30px;
+    }
+
+    #nav a {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    #nav a.router-link-exact-active {
+      color: #42b983;
+    }
+
+    .a4-paper {
+      width: 20cm;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .ivu-table-body {
+      font-size: 15px;
+    }
+
+    .ivu-table-header {
+      font-size: 13px;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      min-width: 120px !important;
+    }
+
+    .ivu-table-header .ivu-table-cell {
+      white-space: nowrap !important;
+    }
+
+    .ivu-table-cell {
+      padding-left: 3px !important;
+      padding-right: 3px !important;
+      padding-bottom: 0px !important;
+    }
+
+    #logo {
+      position: absolute;
+      float: left;
+      left: 17cm;
+    }
+
+    .email-to {
+      color: red;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    td {
+      height: 25px !important;
+    }
+
+    th,
+    th {
+      overflow: visible !important;
+      word-wrap: break-word !important;
+    }
+
+    body {
+      width: 23cm;
+    }
+
+    h2 {
+      text-align: left;
+    }
+
+    .align-left {
+      text-align: left;
+    }
+
+    .page-frame {
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+
+    .galeWarning {
+      color: red;
+    }
+  </style>
+  <title>南鹏岛附近海域海洋气象预报</title>
+  <script>
+    if (!Array.prototype.findIndex) {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        value: function (predicate) {
+          // 1. Let O be ? ToObject(this value).
+          if (this == null) {
+            throw new TypeError('"this" is null or not defined');
+          }
+
+          var o = Object(this);
+
+          // 2. Let len be ? ToLength(? Get(O, "length")).
+          var len = o.length >>> 0;
+
+          // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+          if (typeof predicate !== 'function') {
+            throw new TypeError('predicate must be a function');
+          }
+
+          // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+          var thisArg = arguments[1];
+
+          // 5. Let k be 0.
+          var k = 0;
+
+          // 6. Repeat, while k < len
+          while (k < len) {
+            // a. Let Pk be ! ToString(k).
+            // b. Let kValue be ? Get(O, Pk).
+            // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+            // d. If testResult is true, return k.
+            var kValue = o[k];
+            if (predicate.call(thisArg, kValue, k, o)) {
+              return k;
+            }
+            // e. Increase k by 1.
+            k++;
+          }
+
+          // 7. Return -1.
+          return -1;
+        },
+        configurable: true,
+        writable: true
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app">
+    <div id="main-content">
+      <div class="page-frame">
+        <div class="header">
+          <hr />
+          <img
+            src="data:image/gif;base64,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"
+            id="logo" />
+          <div class="email-to">
+            <h1>南鹏岛附近海域海洋气象预报</h1>传送： 中节能阳江风力发电有限公司
+            <br />
+            起报时间:
+            <br />
+          </div>中国南海石油联合服务总公司、广东省气象台;
+          <br />广州市越秀区福今路6号，邮政编码： 510080; 电话: +86 020 87751755; 邮箱: nymsc@tom.com
+          <br />
+          <hr />
+        </div>
+        <div class="align-left a4-paper">
+          <div class="description">
+            沿海天气描述:
+            <br />
+
+            <br />
+          </div>
+          <div class="description">
+            <br />台风警报:
+            <br />
+
+            <br />
+          </div>
+          <div class="description galeWarning">
+            <br />大风警报:
+            <br />
+            {{test}}
+            <br />
+          </div>
+        </div>
+        <div class="a4-paper" contenteditable="true">
+          <h2>要素预报</h2>
+          <i-table></i-table>&nbsp;
+          <hr />
+        </div>
+      </div>
+      <div class="a4-paper page-frame">
+        <Row>
+          <i-col span="20">
+            <div id="e-chart2" style="width: 22cm;height:350px;"></div>
+            <br />
+            <div id="e-chart3" style="width: 22cm;height:350px;"></div>
+            <br />
+          </i-col>
+          <i-col span="2">&nbsp;</i-col>
+        </Row>
+      </div>
+    </div>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          test: 'hello'
+        }
+      },
+      methods: {
+      },
+      computed: {
+      }
+    })
+  </script>
+</body>
+
+</html>
