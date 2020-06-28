@@ -79,14 +79,15 @@
           <img src="/logocact.gif" id="logo" />
 
           <div class="email-to">
-            <h1>南鹏岛附近海域海洋气象预报</h1>传送： 中节能阳江风力发电有限公司
-            <br />
-            <!--（东经112度20分, 北纬21度30分）21°15'15''N 115°09'33''E<br>
+            <h1>南鹏岛附近海域海洋气象预报</h1>
+            传送： 中节能（阳江）风力发电有限公司<br>
+            <!--（ 北纬21度26分49秒，东经112度10分05秒）<br>
+            
+            112.167 21.444（东经112度20分, 北纬21度30分）21°15'15''N 115°09'33''E<br>
             ; 发布时间: {{localTime[1]}}-->
             起报时间: {{localTime[0]}}
             <br />
-          </div>中国南海石油联合服务总公司、广东省气象台;
-          <br />广州市越秀区福今路6号，邮政编码： 510080; 电话: +86 020 87751755; 邮箱: nymsc@tom.com
+          </div>广东省气象台, 广州市越秀区福今路6号, 邮政编码：510080, 电话: 020-87300282
           <br />
           <hr />
         </div>
@@ -1128,7 +1129,7 @@ export default {
   text-align: left;
   margin-top: 10px;
   margin-bottom: 10px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -1185,7 +1186,7 @@ export default {
 }
 .email-to {
   color: red;
-  font-size: 12px;
+  font-size: 15px;
   text-align: left;
 }
 td {
