@@ -1029,7 +1029,7 @@ export default {
           mixWave: waveFit ? waveFit.MixWave : "",
           t2m: this.t2m[i][0].toFixed(0),
           vis: this.vis[i][0] == 0 ? 0.2 : this.vis[i][0].toFixed(0),// 雾最小0.2
-          modVis,
+          modVis:modVis.length == 0?15 : modVis.toFixed(0),
           swellArrow: swellDir - 90,
           swellRotation: arrowR - (15.0 / 180.0) * Math.PI,
           rain,
