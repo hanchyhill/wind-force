@@ -21,6 +21,8 @@ function timeout(delay) {
   })
 }
 
+const baseUrl = 'http://10.148.16.20:10077';
+
 function getTime(){
   let nowDate = moment(new Date());
   let nowHour = nowDate.hour();
@@ -104,7 +106,7 @@ async function main (timeConfig=getTime()) {
     let iLat = timeConfig.lat;
     let iModel = timeConfig.selectedModel;
     let params = `starttime=${sDate}%20${sTime}&endtime=${eDate}%20${eTime}&lon=${iLon}&lat=${iLat}&modelid=${iModel}`;
-    let urlGetHourlyFc = `http://localhost:8080/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`;
+    let urlGetHourlyFc = `${baseUrl}/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`;
     // const elems = ["u10m", "v10m", "t2mm", "visi", "tppm", "tcco"];
     let res = await axios.get(urlGetHourlyFc);
     let data = res.data;
@@ -144,8 +146,8 @@ async function main (timeConfig=getTime()) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     console.log('正在打开网页');
-    console.log('http://localhost:8080/');
-    await page.goto('http://localhost:8080/');
+    console.log(`${baseUrl}/`);
+    await page.goto(`${baseUrl}/`);
     await page.emulateMedia('screen');
     // await page._emulationManager._client.send(
     //   'Emulation.setDefaultBackgroundColorOverride',
