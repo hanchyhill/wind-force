@@ -766,7 +766,7 @@ export default {
           this.vis = series.visi.map(v=>[v[0]/1000.0,v[1]]);
           this.t2m = series.t2mm.map(v=>[v[0]-273.15,v[1]]);
           this.cloud = series.tcco;
-          this.rainHr = series.tppm;
+          this.rainHr = series.tppm.map(v=>[v[0]*1000.0,v[1]]);
           this.drawData2();
           this.drawData3();
           this.galeWarning = this.getGaleWarning();
@@ -972,6 +972,7 @@ export default {
         let cloud =this.cloud.length?this.cloud[i][0]:0;
         let weather = this.weatherArr.length?this.weatherArr[i][0]:0;
         let iSpeed = Math.sqrt(Math.pow(u10, 2) + Math.pow(v10, 2));
+        if(iSpeed<1) iSpeed = 3;
         let iR = Math.sign(v10) * Math.acos(u10 / iSpeed);
         let arrowR = iR - Math.PI / 2;
         let iknots = iSpeed * 1.944;
@@ -984,6 +985,7 @@ export default {
         if (dir > 360) dir = dir - 360;
         // let wind10m = this.v10m[i][0];
         let waveFit = findWindWave(iknots);
+        
 
         let iTime = fTime.format("MM-DD HH");
         // TODO 修改能见度
@@ -1009,8 +1011,8 @@ export default {
           tableDate: iTime,
           dir: dir.toFixed(0),
           speed: iSpeed,
-          ws10m: iSpeed.toFixed(0),
-          wg10m: waveFit.Gust,
+          ws10m: iSpeed<1?1: iSpeed.toFixed(0),
+          wg10m: waveFit?(Number.parseInt(waveFit.Gust)<1?1:waveFit.Gust):1,
           fTime,
           iknots,
           knots: iknots.toFixed(0),
@@ -1062,7 +1064,7 @@ export default {
       const rainState = this.rainHr.map(data=>{
         const iRain = data[0];
         let state;
-        if(iRain<1){
+        if(iRain<0.5){
           state = '无';
         }else if(iRain<2.5){
           state = '阵雨'
@@ -1090,11 +1092,11 @@ export default {
       const visState = this.vis.map(data=>{
         const iVis = data[0];
         let state;
-        if(iVis<1){
+        if(iVis<0.5){
           state = '大雾';
-        }else if(iVis<4){
+        }else if(iVis<1){
           state = '雾'
-        }else if(iVis<8){
+        }else if(iVis<4){
           state = '轻雾'
         }else{
           state = '无'
@@ -1107,8 +1109,8 @@ export default {
         let iState = cloudState[i][0];
         let iVis = visState[i][0];
         let iRain = rainState[i][0];
-        if(iRain.indexOf('雨')!==-1) iState = iRain;
         if(iVis.indexOf('雾')!==-1) iState = iVis;
+        if(iRain.indexOf('雨')!==-1) iState = iRain;
         weatherState[i] = [iState, cloudState[i][1]];
       }
       return weatherState;

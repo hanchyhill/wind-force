@@ -192,7 +192,7 @@ async function main (timeConfig=getTime()) {
 
     await page.screenshot({path: '//10.148.16.32/e/ssow/html/'+imgName,fullPage: true});
     await page.screenshot({path:  '//10.148.16.32/e/ssow/html/'+fitName+'.jpg',fullPage: true});
-    ejsHTML({imgSrc:'fitName.jpg'})
+    ejsHTML({imgSrc:fitName+'.jpg'})
     .then(html=>{
       fs.writeFile('//10.148.16.32/e/ssow/html/'+`${fitName}.html`, html, (err)=>{if (err) {
         return console.error(err);
