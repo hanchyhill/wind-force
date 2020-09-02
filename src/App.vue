@@ -54,11 +54,29 @@
             <Option v-for="item in hourList" :value="item.value" :key="item.value">{{item.label}}</Option>
           </Select>
         </Col>
-        <Col span="2">
+        <!-- <Col span="2">
           <Button @click="convert2pdf" type="info">导出pdf</Button>
         </Col>
         <Col span="2">
           <Button @click="readFromFile" type="primary">读取本地</Button>
+        </Col> -->
+      </Row>
+      <Row>
+        <Col span="4">
+        最小风速: 
+          <InputNumber v-model="windMinThreshold"  :max="windAmpThreshold" :min="0" placeholder="最小风速" />
+        </Col>
+        <Col span="5">
+        风速增幅上限:
+          <InputNumber v-model="windAmpThreshold" :min="0" placeholder="风速增幅阈值" />
+        </Col>
+        <Col span="4">
+        最小涌高: 
+          <InputNumber v-model="swellMinThreshold"  :max="swellAmpThreshold" :min="0" placeholder="最小风速" :step="0.1" />
+        </Col>
+        <Col span="6">
+        涌高增幅上限:
+          <InputNumber v-model="swellAmpThreshold" :min="0" placeholder="风速增幅阈值" :step="0.1" />
         </Col>
       </Row>
       <Row>
@@ -67,11 +85,7 @@
         <Input v-model="galeWarning" type="textarea" placeholder="大风预警" />
       </Row>
     </div>
-    <!--<Row>
-      <Button @click="drawData" type="info">1714帕卡</Button>
-      <Button @click="drawData" type="info">1713天鸽</Button>
-      <Button @click="drawData" type="info">59488</Button>
-    </Row>-->
+
     <div id="main-content" contenteditable="true">
       <div class="page-frame">
         <div class="header" @click="showControl=!showControl">
@@ -240,6 +254,10 @@ export default {
       showControl: false,
       isCollapsed: true,
       isShift: true,
+      windMinThreshold: 3,
+      windAmpThreshold: 6,
+      swellMinThreshold: 0.4,
+      swellAmpThreshold: 0.8,
       u10m: [],
       v10m: [],
       t2m: [],
@@ -435,7 +453,8 @@ export default {
       // const ws100m = this.tableData.map(v=>v.ws100m);
       // const wg100m = this.tableData.map(v=>v.wg100m);
       // const knots = this.tableData.map(v=>v.knots);
-      const ws10m = this.tableData.map(v => v.ws10m);
+      // const ws10m = this.tableData.map(v => v.ws10m);
+      const ws10m = this.tableData.map(v => v.speed.toFixed(2));
       const wg10m = this.tableData.map(v => v.wg10m);
       const maxValue = Math.max(...wg10m);
       const data = this.speed.map((v, i) => [
@@ -527,7 +546,7 @@ export default {
       const hs = this.tableData.map(v => v.hs);
       const hmax = this.tableData.map(v => v.hmax);
       const swellH = this.tableData.map(v => v.swellH);
-      const waveT = this.tableData.map(v => v.waveT);
+      // const waveT = this.tableData.map(v => v.waveT);
       const maxValue = Math.max(...hmax);
       const data = this.tableData.map((v, i) => [
         v.hmax,
@@ -546,7 +565,7 @@ export default {
           trigger: "axis"
         },
         legend: {
-          data: ["浪高", "最大浪高", "涌浪", "周期"]
+          data: ["浪高", "最大浪高", "涌浪", ]// "周期"]
         },
         xAxis: {
           type: "category",
@@ -564,14 +583,14 @@ export default {
               formatter: "{value} m"
             }
           },
-          {
-            name: "周期",
-            type: "value",
-            max: Math.max(...waveT) + 5,
-            axisLabel: {
-              formatter: "{value} s"
-            }
-          }
+          // {
+          //   name: "周期",
+          //   type: "value",
+          //   max: Math.max(...waveT) + 5,
+          //   axisLabel: {
+          //     formatter: "{value} s"
+          //   }
+          // }
         ],
 
         series: [
@@ -621,19 +640,19 @@ export default {
             type: "line",
             data: swellH
           },
-          {
-            name: "周期",
-            yAxisIndex: 1,
-            smooth: true,
-            symbol: "diamond",
-            symbolSize: 10,
-            lineStyle: { normal: { color: "black", width: 2, type: "dashed" } }, //type: 'dashed'
-            itemStyle: {
-              normal: { borderWidth: 1, borderColor: "black", color: "black" }
-            },
-            type: "line",
-            data: waveT
-          },
+          // {
+          //   name: "周期",
+          //   yAxisIndex: 1,
+          //   smooth: true,
+          //   symbol: "diamond",
+          //   symbolSize: 10,
+          //   lineStyle: { normal: { color: "black", width: 2, type: "dashed" } }, //type: 'dashed'
+          //   itemStyle: {
+          //     normal: { borderWidth: 1, borderColor: "black", color: "black" }
+          //   },
+          //   type: "line",
+          //   data: waveT
+          // },
           {
             type: "custom",
             name: "涌向",
@@ -972,9 +991,11 @@ export default {
         let cloud =this.cloud.length?this.cloud[i][0]:0;
         let weather = this.weatherArr.length?this.weatherArr[i][0]:0;
         let iSpeed = Math.sqrt(Math.pow(u10, 2) + Math.pow(v10, 2));
-        if(iSpeed<1) iSpeed = 3;
         let iR = Math.sign(v10) * Math.acos(u10 / iSpeed);
         let arrowR = iR - Math.PI / 2;
+        if(iSpeed<this.windAmpThreshold) iSpeed = (this.windAmpThreshold-this.windMinThreshold)/this.windAmpThreshold * iSpeed + this.windMinThreshold;
+
+
         let iknots = iSpeed * 1.944;
         let windDir = iR + Math.PI; //风的来向
         windDir = -(windDir - Math.PI / 2); //与北向的角度差
@@ -1004,7 +1025,8 @@ export default {
         //console.log(wind10m);
         let swellDir = (windDir / Math.PI) * 180 + 15;
         if (swellDir > 360) swellDir = swellDir - 360;
-        //if(waveDir)
+        let swellH = waveFit ? waveFit.SurgeHeight : 0;
+        if(swellH<this.swellAmpThreshold) swellH = (this.swellAmpThreshold-this.swellMinThreshold)/this.swellAmpThreshold * swellH + this.swellMinThreshold;
         let colo = {
           windDir: (windDir * 180) / Math.PI,
           interval: this.v10m[i][1],
@@ -1027,7 +1049,7 @@ export default {
           waveH: waveFit ? waveFit.AverageWaveHeight : "",
           waveT: waveFit ? waveFit.WavePeriod : "",
           swellDir: swellDir.toFixed(0),
-          swellH: waveFit ? waveFit.SurgeHeight : "",
+          swellH: swellH.toFixed(1), //: waveFit ? waveFit.SurgeHeight : "",
           swellT: waveFit ? waveFit.SurgePeriod : "",
           mixWave: waveFit ? waveFit.MixWave : "",
           t2m: this.t2m[i][0].toFixed(0),
@@ -1122,6 +1144,10 @@ export default {
     },
     fcHour() {
       this.changeTitle();
+    },
+    tableData(){
+      this.drawData2();
+      this.drawData3();
     }
   }
 };
