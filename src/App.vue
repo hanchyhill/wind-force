@@ -1025,7 +1025,7 @@ export default {
         //console.log(wind10m);
         let swellDir = (windDir / Math.PI) * 180 + 15;
         if (swellDir > 360) swellDir = swellDir - 360;
-        let swellH = waveFit ? waveFit.SurgeHeight : 0;
+        let swellH = waveFit ? Number(waveFit.SurgeHeight) : 0;
         if(swellH<this.swellAmpThreshold) swellH = (this.swellAmpThreshold-this.swellMinThreshold)/this.swellAmpThreshold * swellH + this.swellMinThreshold;
         let colo = {
           windDir: (windDir * 180) / Math.PI,
