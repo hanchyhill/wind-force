@@ -254,8 +254,8 @@ export default {
       showControl: false,
       isCollapsed: true,
       isShift: true,
-      windMinThreshold: 3,
-      windAmpThreshold: 6,
+      windMinThreshold: 4,
+      windAmpThreshold: 7,
       swellMinThreshold: 0.4,
       swellAmpThreshold: 0.8,
       u10m: [],
@@ -721,7 +721,7 @@ export default {
       let iLat = this.lat;
       let iModel = this.selectedModel;
       let params = `starttime=${sDate}%20${sTime}&endtime=${eDate}%20${eTime}&lon=${iLon}&lat=${iLat}&modelid=${iModel}`;
-      let urlGetHourlyFc = `/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`;
+      let urlGetHourlyFc = encodeURI(`/api?interface=getHourlyElems&elements=u10m v10m t2mm visi tppm tcco&${params}`);
       this.getElemsHourly(urlGetHourlyFc);
       let desTime = moment(this.initTime + this.fcHour, "YYYY-MM-DDHH:mm:ss")
         .add(8, "hours")
@@ -1053,8 +1053,8 @@ export default {
           swellT: waveFit ? waveFit.SurgePeriod : "",
           mixWave: waveFit ? waveFit.MixWave : "",
           t2m: this.t2m[i][0].toFixed(0),
-          vis: this.vis[i][0] == 0 ? 0.2 : this.vis[i][0].toFixed(0),// 雾最小0.2
-          modVis:modVis.length == 0?15 : modVis.toFixed(0),
+          vis: this.vis[i][0] <0.2 ? 0.2 : this.vis[i][0] < 1?this.vis[i][0].toFixed(1):this.vis[i][0].toFixed(1),// 雾最小0.2
+          modVis:modVis.length == 0? 15 : modVis <0.2 ? 0.2 : modVis < 1?modVis.toFixed(1):modVis.toFixed(0),
           swellArrow: swellDir - 90,
           swellRotation: arrowR - (15.0 / 180.0) * Math.PI,
           rain,
