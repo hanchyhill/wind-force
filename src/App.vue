@@ -33,9 +33,9 @@
       <Col span="2">
         <Button @click="readFromFile" type="primary">读取本地</Button>
       </Col>
-      <Input v-model="desEN" type="textarea" placeholder="英文天气描述" />
-      <Input v-model="desTY" type="textarea" placeholder="英文台风描述" />
-      <Input v-model="galeWarning" type="textarea" placeholder="Gale Warning" />
+      <Input v-model="desCN" type="textarea" placeholder="中文天气描述" />
+      <Input v-model="desTY" type="textarea" placeholder="中文台风描述" />
+      <Input v-model="galeWarning" type="textarea" placeholder="强风警报" />
       
   </Row>
     <!--<Row>
@@ -46,40 +46,42 @@
     <div id="main-content" contenteditable="true">
     <div class="page-frame">
       <div class="header" @click="showControl=!showControl">
+        <h1>
+          中海石油（中国）有限公司湛江分公司单点预报示例
+        </h1>
         <hr>
         <img src="/logocact.gif" id="logo">
-        METEOROLOGICAL SERVICE CO. OF SCSOJSC GUANGDONG METEOROLOGICAL OBSERVATORY<br>
-        GUANGDONG METEOROLOGICAL OBSERVATORY NO.6 FUJIN ROAD YUEXIU, GUANGZHOU<br>
-        GUANGDONG, CHINA 510080 PHONE: +86 20 87751755 EMAIL: nymsc@tom.com<br>
+        <br>
         <div class="email-to">
-        TO: ENI CHINA B.V.; ATTN: Mr. OPERATIONS MANAGER<br>
-        Subject: MARINE WEATHER FORECAST FOR LOCATION HZ25-10-1<br>
+        传送： 中海石油（中国）有限公司湛江分公司 测试点（北纬19.875度, 东经108.75度）<br>
+        起报时间：202X年2月3日14:00北京时<br>
+        发布时间：2月3日11时00分 <br>
         <!--21°15'15''N 115°09'33''E<br>-->
-        Base Time: {{localTime[0]}}; Issued Time: {{localTime[1]}}<br>
+        <!-- Base Time: {{localTime[0]}}; Issued Time: {{localTime[1]}}<br> -->
         </div>
         <hr>
       </div>
       <div class="align-left a4-paper" >
-        <div class="description" v-show="desEN">
-          Dominant Weather Situation:<br>
-          {{desEN}}
+        <div class="description" v-show="desCN">
+          天气形势描述:<br>
+          {{desCN}}
           <br>
         </div>
         <div class="description" v-show="desTY">
           <br>
-          TC WARNING:<br>
+          台风警报:<br>
           {{desTY}}
           <br>
         </div>
         <div class="description galeWarning" v-show="galeWarning">
           <br>
-          Gale Warning:<br>
+          强风警报:<br>
           {{galeWarning}}
           <br>
         </div>
       </div>
       <div class="a4-paper" contenteditable="true">
-        <h2>Elemental Forecast</h2>
+        <h2>海洋气象单点要素预报</h2>
         <Table :columns="columns1" :data="tableData" :border="true" :stripe="true" :size="'small'"></Table>
         &nbsp;
         <hr>
@@ -101,12 +103,12 @@
         
       </Row>
     </div>
-    <div class="a4-paper page-frame">
+    <!-- <div class="a4-paper page-frame">
       <h2>Weather Chart</h2>
       <br>
       <img style="width: 14cm;" :src="imgTime[0]"></img>
       <img style="width: 14cm;" :src="imgTime[1]"></img>
-    </div>
+    </div> -->
     </div>
   </div>
 </template>
@@ -207,16 +209,16 @@
         v10m:[],
         t2m:[],
         vis:[],
-        desEN:'',
+        desCN:'',
         desTY:'',
         galeWarning:'',
         columns1: [
           {
-            title: 'Date',
+            title: '日期(北京时)',
             //key: 'tableDate',
             children:[
               {
-                title: 'MM-DD HH',
+                title: '月-日 时',
                 key: 'tableDate',
                  "width": 80,
                 align: 'center',
@@ -224,67 +226,34 @@
               }],
           },
           {
-            title:'WINDS(KTS)',
+            title:'风速(米/秒)',
             align: 'center',
             children:[
               {
-                title: 'Dir',
+                title: '方位角',
                 key: 'dir',
                 align: 'center',
                 //"width": 70,
               },
               {
-                title: 'Ws',
+                title: '平均风',
                 align: 'center',
                 children:[
                   {
-                    title:'10m',
-                    key: 'knots',
+                    title:'10米',
+                    key: 'speed10m',
                     align: 'center',
                     
                   }
                 ],
               },
               {
-                title: 'Ws',
+                title: '阵风',
                 align: 'center',
                 children:[
                   {
-                    title:'50m',
-                    key: 'ws50m',
-                    align: 'center',
-                  }
-                ],
-              },
-              {
-                title: 'Wg',
-                align: 'center',
-                children:[
-                  {
-                    title:'50m',
-                    key: 'wg50m',
-                    align: 'center',
-                  }
-                ],
-              },
-              {
-                title: 'Ws',
-                align: 'center',
-                children:[
-                  {
-                    title:'100m',
-                    key: 'ws100m',
-                    align: 'center',
-                  }
-                ],
-              },
-              {
-                title: 'Wg',
-                align: 'center',
-                children:[
-                  {
-                    title:'100m',
-                    key: 'wg100m',
+                    title:'10米',
+                    key: 'speedGust',
                     align: 'center',
                   }
                 ],
@@ -292,44 +261,45 @@
               ],
           },
           {
-            title:'WIND WAVES (M)',
+            title:'风浪(米)',
             align: 'center',
             children:[
               {
-                title: 'Hs',
-                width:32,
+                title: '浪高',
+                width:40,
                 key: 'waveH',
                 align: 'center',
               },
               {
-                title: 'Hmax',
-                width:45,
+                title: '最大浪高',
+                width:60,
                 key: 'hmax',
                 align: 'center',
               },
               {
-                title: 'PER',
+                title: '周期',
+                width:40,
                 key: 'waveT',
                 align: 'center',
               },
             ],
           },
           {
-            title:'SWELL',
+            title:'涌浪(米)',
             align:'center',
             children:[
               {
-                title: 'Dir',
+                title: '方位角',
                 key: 'swellDir',
                 align: 'center',
               },
               {
-                title: 'H',
+                title: '高度',
                 key: 'swellH',
                 align: 'center',
               },
               {
-                title: 'PER',
+                title: '周期',
                 key: 'swellT',
                 align: 'center',
                 //"width": 70,
@@ -337,11 +307,11 @@
             ],
           },
           {
-            title:'COMB',
+            title:'合成浪',
             align:'center',
             children:[
               {
-                title: 'HT',
+                title: '',
                 width:48,
                 key: 'mixWave',
                 align: 'center',
@@ -349,16 +319,16 @@
             ],
           },
           {
-            title:'WEATHER',
+            title:'天气',
             align:'center',
             children:[
               {
-                title: 'T2m',
+                title: '气温',
                 key: 't2m',
                 align: 'center',
               },
               {
-                title: 'VIS',
+                title: '能见度',
                 key: 'vis',
                 align: 'center',
                 //"width": 70,
@@ -374,7 +344,7 @@
         lon:115.2,
         lat:21.3,
         initTime:fitDate,//'2018-12-26',
-        selectedModel:'giftoceanzd',
+        selectedModel:'ecmwfthin',
         modelList:[{label:'GIFT海洋',value:'giftoceanzd'},
                    {label:'国家局海洋',value:'ocbu_scmoc'},
                    {label:'欧洲',value:'ecmwfthin'},
@@ -403,6 +373,8 @@
         this.speed.forEach(v=>v.time=moment(iTime).add(v.time,'hours').format('DD-HH'));
         //const ySeries = this.speed.map(v=>v.speed);
         const xTime = this.speed.map(v=>v.time);
+        const ws10m = this.tableData.map(v=>v.speed10m);
+        const wg10m = this.tableData.map(v=>v.speedGust);
         const ws50m = this.tableData.map(v=>v.ws50m);
         const wg50m = this.tableData.map(v=>v.wg50m);
         const ws100m = this.tableData.map(v=>v.ws100m);
@@ -413,13 +385,13 @@
         // data.max = Math.max(...data.map(v=>v[0]));
         // console.log('绘制');
         // const myChart = echarts.init(document.getElementById('e-chart2'), null, {renderer: 'svg'});
-        const myChart = echarts.init(document.getElementById('e-chart2'));
+        const myChart = echarts.init(document.getElementById('e-chart2'), null, {renderer: 'svg'});
         var option = {
             grid: {
             show:true,
             },
             title: {
-              text: 'Wind Forecast',
+              text: '风力预报',
               // left: 'center'
             },
             tooltip: {
@@ -427,7 +399,7 @@
               
             },
             legend: {
-                data:['Wg100m','Ws100m','Wg50m','Ws50m','Ws10m',],
+                data:['平均风','阵风'],
                 //orient:'vertical',
                 //right:-10,
                 //top:'20%',
@@ -443,61 +415,61 @@
             yAxis: {
               type: 'value',
               axisLabel: {
-                formatter: '{value} KTS'
+                formatter: '{value} 米/秒'
               },
             },
             series: [
               {
-                name: 'Ws10m',
+                name: '平均风',
                 type: 'line',
                 smooth: true,
                 //symbol: 'roundRect',
                 //symbolSize: 8,
                 lineStyle: {normal: {width: 2,}},//type: 'dashed'
                 itemStyle: {normal: {borderWidth: 1,borderColor: 'black',color: 'black'}},
-                data: knots,
+                data: ws10m,
               },
               {
-                name: 'Ws50m',
+                name: '阵风',
                 type: 'line',
                 smooth: true,
                 symbol: 'triangle',
                 symbolSize: 8,
                 lineStyle: {normal: {width: 2,}},//type: 'dashed'
                 itemStyle: {normal: {borderWidth: 1,borderColor: 'blue',color: 'blue'}},
-                data: ws50m,
+                data: wg10m,
               },
-            {
-              name: 'Wg50m',
-              type: 'line',
-              smooth: true,
-              symbol: 'rect',
-              symbolSize: 8,
-              lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
-              itemStyle: {normal: {borderWidth: 2,borderColor: 'green',color: 'green'}},
-              data: wg50m,
-            },
-            {
-              name: 'Ws100m',
-              type: 'line',
-              smooth: true,
-              symbol: 'diamond',
-              symbolSize: 8,
-              lineStyle: {normal: {width: 2,color:'orange'}},//type: 'dashed'
-              itemStyle: {normal: {borderWidth: 2,borderColor: 'orange',color: 'orange'}},
-              data: ws100m,
-            },
-            {
-              name: 'Wg100m',
-              type: 'line',
-              smooth: true,
-              symbol: 'circle',
-              symbolSize: 8,
-              //color:'orange',
-              lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
-              itemStyle: {normal: {borderWidth: 2,borderColor: 'red',color: 'red'}},
-              data: wg100m,
-            },
+            // {
+            //   name: 'Wg50m',
+            //   type: 'line',
+            //   smooth: true,
+            //   symbol: 'rect',
+            //   symbolSize: 8,
+            //   lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
+            //   itemStyle: {normal: {borderWidth: 2,borderColor: 'green',color: 'green'}},
+            //   data: wg50m,
+            // },
+            // {
+            //   name: 'Ws100m',
+            //   type: 'line',
+            //   smooth: true,
+            //   symbol: 'diamond',
+            //   symbolSize: 8,
+            //   lineStyle: {normal: {width: 2,color:'orange'}},//type: 'dashed'
+            //   itemStyle: {normal: {borderWidth: 2,borderColor: 'orange',color: 'orange'}},
+            //   data: ws100m,
+            // },
+            // {
+            //   name: 'Wg100m',
+            //   type: 'line',
+            //   smooth: true,
+            //   symbol: 'circle',
+            //   symbolSize: 8,
+            //   //color:'orange',
+            //   lineStyle: {normal: {width: 2,type: 'dashed'}},//type: 'dashed'
+            //   itemStyle: {normal: {borderWidth: 2,borderColor: 'red',color: 'red'}},
+            //   data: wg100m,
+            // },
             {
             type: 'custom',
             name:'dir',
@@ -532,10 +504,10 @@
         
         // console.log(this.speed);
         //const myChart = echarts.init(document.getElementById('e-chart3'), null, {renderer: 'svg'});
-        const myChart = echarts.init(document.getElementById('e-chart3'));
+        const myChart = echarts.init(document.getElementById('e-chart3'), null, {renderer: 'svg'});
         var option = {
             title: {
-              text: 'Wave Forecast',
+              text: '海浪预报',
               // left: 'center'
             },
             tooltip: {
@@ -543,7 +515,7 @@
               
             },
             legend: {
-                data:['Hs','Hmax','H-swell','Period']
+                data:['浪高','最大浪高','涌浪','周期']
             },
             xAxis: {
               type : 'category',
@@ -554,18 +526,18 @@
               axisLine: {onZero: true},
             },
             yAxis: [{
-              name:'HEIGHT',
+              name:'高度',
               type: 'value',
               axisLabel: {
-                formatter: '{value} m'
+                formatter: '{value} 米'
               },
             },
               {
-              name:'PERIOD',
+              name:'周期',
               type: 'value',
               max:Math.max(...waveT)+5,
               axisLabel: {
-                formatter: '{value} s'
+                formatter: '{value} 秒'
                 },
               },
             ],
@@ -575,7 +547,7 @@
             //},
             series: [
             {
-              name: 'Hs',
+              name: '浪高',
               smooth: true,
               symbol: 'triangle',
               symbolSize: 10,
@@ -602,12 +574,12 @@
                 color: 'blue'
                 }
               },
-              name: 'Hmax',
+              name: '最大浪高',
               type: 'line',
               data: hmax,
             },
             {
-              name: 'H-swell',
+              name: '涌浪',
               smooth: true,
               symbol: 'rect',//'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow', 'none'
               symbolSize: 10,
@@ -617,7 +589,7 @@
               data: swellH,
             },
             {
-              name: 'Period',
+              name: '周期',
               yAxisIndex:1,
               smooth: true,
               symbol: 'diamond',
@@ -663,7 +635,8 @@
             this.t2m = data.t2m;
           }
           console.log(this.getGaleWarning());
-          this.galeWarning = this.getGaleWarning();
+          // this.galeWarning = this.getGaleWarning();
+          this.galeWarning = `从2月3日 14时起，风速超过15米/秒（阵风20米/秒)。`;
           this.drawData2();
           this.drawData3();
         })
@@ -676,9 +649,12 @@
         this.getDes(desTime);
       },
       searchData(){
-        let sDate = this.initTime;
-        let sTime = this.fcHour;
-        let eDate = moment(sDate,'YYYY-MM-DD').add(7,'days').format('YYYY-MM-DD');
+        // let sDate = this.initTime;
+        // let sDate = moment('2021-02-02','YYYY-MM-DD');
+        // let sTime = this.fcHour;
+        let sDate = '2021-02-02';
+        let sTime = '12:00:00';
+        let eDate = moment(sDate,'YYYY-MM-DD').add(10,'days').format('YYYY-MM-DD');
         let iLon = this.lon;
         let iLat = this.lat;
         let iModel = this.selectedModel;
@@ -732,7 +708,8 @@
         .then(res=>{
           let desString = res.data;
           this.desTY = desString.tyString;
-          this.desEN = desString.enString;
+          // this.desCN = desString.enString;
+          this.desCN = `沿海风球信号：陆丰到斗门挂强风信号1号风球。今天白天，粤东-粤中沿海东北风6-7级转5级，粤西沿海东北风5到6级，夜间全线风力减弱到5级以下。未来几天北部湾到珠外海面有雾或轻雾，敬请注意！`;
         })
         .catch(err=>{
           console.error(err)
@@ -831,6 +808,7 @@
           // let wind10m = this.v10m[i][0];
           let waveFit = findWindWave(iknots);
           
+          let fit10 = findWindWave(iknots);
           let iTime = fTime.format('MM-DD HH');
           let iV50 = iknots*Math.pow(5,0.12);
           let fit50 = findWindWave(iV50);
@@ -849,7 +827,9 @@
             interval: this.v10m[i][1],
             tableDate: iTime,
             dir: dir.toFixed(0),
-            speed:iSpeed,
+            speed:iSpeed,// 10米风速
+            speed10m: iSpeed.toFixed(0),
+            speedGust: fit10?fit10.Gust:'',
             fTime,
             iknots,
             knots:iknots.toFixed(0),
@@ -1000,5 +980,7 @@ h2{
 .galeWarning{
   color:red;
 }
-
+.header h1{
+  color: rgb(223, 55, 55);
+}
 </style>
