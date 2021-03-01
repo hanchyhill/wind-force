@@ -21,7 +21,7 @@ function timeout(delay) {
   })
 }
 
-const baseUrl = 'http://10.148.16.20:10077';
+const baseUrl = 'http://10.148.16.20:10079';
 
 function getTime(){
   let nowDate = moment(new Date());
@@ -122,7 +122,7 @@ async function main (timeConfig=getTime()) {
   }
   try{
     //const timeConfig = getTime();
-    const fitName = 'YJFD-nanpeng-hourly';
+    const fitName = 'ZHWS-zhuwai-hourly';
     const fileName = `${fitName}-${timeConfig.fileTime}.pdf`;
     const imgName = `${fitName}-${timeConfig.fileTime}.jpg`;
     
@@ -156,6 +156,7 @@ async function main (timeConfig=getTime()) {
     await page.setViewport({
       width: 900,//1024,
       height: 768,
+      deviceScaleFactor: 2,
     });
     console.log('喝杯茶，等待20秒数据中心接口回传');
     await timeout(20000);
@@ -205,10 +206,10 @@ async function main (timeConfig=getTime()) {
       }});
     });
     
-    let openDir = path.dirname(path.resolve(__dirname,'pdf/'+fileName));
-    console.log(openDir);
-    spawn('explorer.exe', [openDir]);
-    spawn('explorer.exe', ['\\\\10.148.16.32\\e\\ssow\\email\\']);
+    // let openDir = path.dirname(path.resolve(__dirname,'pdf/'+fileName));
+    // console.log(openDir);
+    // spawn('explorer.exe', [openDir]);
+    spawn('explorer.exe', ['\\\\10.148.16.32\\e\\ssow\\html\\']);
     console.log('打开资源管理器'); 
     
     await browser.close();
