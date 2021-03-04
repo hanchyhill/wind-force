@@ -1,0 +1,14 @@
+{
+  "development":{
+    "IDEA":{
+      "username":"SQXT_hanpucheng",
+      "password":"hanpucheng_3032"
+    }
+  },
+  "production":{
+    "IDEA":{
+      "username":"SQXT_tfjc",
+      "password":"tfjc_1b63"
+    }
+  }
+}

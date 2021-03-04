@@ -10,8 +10,20 @@ const axios = require('axios');
 const util = require('util');
 const fs = require('fs');
 const {getDes} = require('./getDes.js')
-
 const readFile = util.promisify(fs.readFile);
+const privateConfig = require('./config/private.config.json');
+const ideaConfig = {
+  username:'',
+  password:'',
+}
+if (process.env.NODE_ENV === 'production') {
+  ideaConfig.username = privateConfig.production.IDEA.username;
+  ideaConfig.password = privateConfig.production.IDEA.password;
+  } else {
+  ideaConfig.username = privateConfig.development.IDEA.username;
+  ideaConfig.password = privateConfig.development.IDEA.password;
+}
+console.log(ideaConfig);
 
 router.get('/api',async(ctx,next)=>{
   //ctx.body = 'hello world';
@@ -22,7 +34,7 @@ router.get('/api',async(ctx,next)=>{
     const lon = ctx.query.lon;
     const lat = ctx.query.lat;
     const modelid = ctx.query.modelid;
-    const url = `http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
+    const url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
     // http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwf_s2s&element=u10m v10m t2mm visi tppm tcco&level=0&starttime=2020-06-15 12:00:00&endtime=2020-06-17 12:00:00&lon=112.25&lat=21.5
     const res = await axios.get(url);
     console.log(url);
@@ -34,7 +46,7 @@ router.get('/api',async(ctx,next)=>{
     const lon = ctx.query.lon;
     const lat = ctx.query.lat;
     const modelid = ctx.query.modelid;
-    const url = `http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
+    const url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
     //           http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwf_s2s&element=u10m v10m t2mm visi tppm tcco&level=0&starttime=2020-06-15 12:00:00&endtime=2020-06-17 12:00:00&lon=112.25&lat=21.5
     const res = await axios.get(url);
     console.log(url);
