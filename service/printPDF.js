@@ -207,7 +207,7 @@ async function main (timeConfig=getTime()) {
     
     let openDir = path.dirname(path.resolve(__dirname,'pdf/'+fileName));
     console.log(openDir);
-    spawn('explorer.exe', [openDir]);
+    // spawn('explorer.exe', [openDir]);
     spawn('explorer.exe', ['\\\\10.148.16.32\\e\\ssow\\html\\']);
     console.log('打开资源管理器'); 
     
