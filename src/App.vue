@@ -447,7 +447,7 @@ export default {
             .format("DD-HH"))
       );
       //const ySeries = this.speed.map(v=>v.speed);
-      const xTime = this.speed.map(v => v.time);
+      const xTime = this.tableData.map(v => v.fTime.format("DD-HH"));
       // const ws50m = this.tableData.map(v=>v.ws50m);
       // const wg50m = this.tableData.map(v=>v.wg50m);
       // const ws100m = this.tableData.map(v=>v.ws100m);
