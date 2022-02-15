@@ -130,14 +130,15 @@
           <img src="/logocact.gif" id="logo" />
 
           <div class="email-to">
-            <h1>南鹏岛附近海域海洋气象预报</h1>
-            传送： 中节能（阳江）风力发电有限公司<br />
+            <h1>徐闻东海域采砂场海洋气象预报</h1>
+            传送： 徐闻绿色建材有限公司<br />
             <!--（ 北纬21度26分49秒，东经112度10分05秒）<br>
             
-            112.167 21.444（东经112度20分, 北纬21度30分）21°15'15''N 115°09'33''E<br>
+            110.716468 20.684620<br>
             ; 发布时间: {{localTime[1]}}-->
             起报时间: {{ localTime[0] }}
             <br />
+            主要参照平均风速和浪高预报，最大浪高在恶劣天气影响下作为参考。
           </div>
           广东省气象台, 广州市越秀区福今路6号, 邮政编码：510080, 电话:
           020-87300282
@@ -432,8 +433,8 @@ export default {
         { label: "14", value: "06:00:00" },
         { label: "20", value: "12:00:00" },
       ],
-      lon: 112.25,
-      lat: 21.5,
+      lon: 110.8,
+      lat: 20.7,
       initTime: fitDate, //'2018-12-26',
       modelInitDate,
       modelFcHour,
@@ -1317,12 +1318,12 @@ h2 {
   color: red;
 }
 
-.ivu-table .green-cell, .ivu-table .green-cell .ivu-table-cell{
+/* .ivu-table .green-cell, .ivu-table .green-cell .ivu-table-cell{
   background-color: #13cf32;
   color: #fff;
 }
 .ivu-table .red-cell, .ivu-table .red-cell .ivu-table-cell{
   background-color: #b91c1c;
   color: #fff;
-}
+} */
 </style>
