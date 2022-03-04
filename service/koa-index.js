@@ -52,7 +52,13 @@ router.get('/api',async(ctx,next)=>{
     console.log(url);
     const res = await axios.get(url);
     
-    ctx.body = res.data;
+    let info = res.data;
+    if(modelid=='ecmwfthin'){
+      if(info.DATA) info.DATA = interploteData(info.DATA);
+      ctx.body = res.data = info;
+    }else{
+      ctx.body = res.data;
+    }
   }else if(ctx.query.interface=='getDes'){
     const dateString = ctx.query.dateString;
     //201812270800
@@ -70,6 +76,38 @@ router.get('/api',async(ctx,next)=>{
   
   await next();
 });
+
+function interploteData(data) {
+  if(data.length==0) return data;// 无数据直接返回原值
+
+  let dataPair = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] > -999.0) {// 找出所有的有效数字
+      dataPair.push({ index: i, value: data[i] });
+    }
+  }
+  if(dataPair.length==0) return data;// 无数据直接返回原值
+
+  for (let i = 1; i < data.length - 1; i++) {// 不处理第一个元素和最后一个元素，单独处理
+    if (data[i] < -999.0) {
+      let betweenIndex = dataPair.findIndex((pair, cIndex) => {
+        if (cIndex + 1 < dataPair.length) {// 防止越界 
+          return pair.index < i && dataPair[cIndex + 1].index > i;
+        } else {
+          return false;
+        }
+      });
+      if (betweenIndex > -1) {
+        data[i] = (dataPair[betweenIndex].value * (dataPair[betweenIndex + 1].index - i) + dataPair[betweenIndex + 1].value * (i - dataPair[betweenIndex].index)) / (dataPair[betweenIndex + 1].index - dataPair[betweenIndex].index);
+      }else{
+        i<dataPair[0].index? data[i] = dataPair[0].value:data[i] = dataPair[dataPair.length-1].value;// 头尾缺测找最近值补充
+      }
+    }
+  }
+  if(data[0] < -999.0) data[0] = dataPair[0].value;
+  if(data[data.length-1] < -999.0) data[data.length-1] = dataPair[dataPair.length-1].value;
+  return data;
+}
 
 const main = async (ctx,next)=>{
   ctx.set('Access-Control-Allow-Origin', '*');
