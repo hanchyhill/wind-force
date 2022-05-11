@@ -932,7 +932,7 @@ export default {
         }, () => { console.log('finish!'); }); */
     },
     changeTitle() {
-      document.title = `GDMO ${this.initTime} ${this.fcHour} HZ25-10-1`;
+      document.title = `GDMO 粤电-青州岛${this.initTime} ${this.fcHour}`;
     },
     getGaleWarning() {
       if (!this.tableData.length || this.tableData.length < 6) return "";
