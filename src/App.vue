@@ -1,5 +1,27 @@
 <template>
   <div id="app">
+    <Modal
+      v-model="openModal"
+      title="导出的JSON文件"
+      @on-ok="确认"
+      @on-cancel="取消;"
+    >
+      <Input
+        ref="textJson"
+        :value="jsonoutput"
+        :autosize="{ minRows: 2, maxRows: 10 }"
+        type="textarea"
+        placeholder="Enter something..."
+      />
+      <Button type="primary" icon="ios-search" @click="copyText('textJson')"
+            >复制JSON到剪贴板</Button
+          >
+      <div>
+        文件名<br>
+        YDQZD-hourly.json<br>
+        YDQZD-hourly-{{localTime[2]}}.json
+      </div>
+    </Modal>
     <div class="show-control" v-show="showControl">
       <Row>
         <Col span="3">
@@ -114,6 +136,11 @@
             placeholder="风速增幅阈值"
             :step="0.1"
           />
+        </Col>
+        <Col span="3">
+          <Button type="primary" icon="ios-search" @click="outputJson"
+            >导出JSON</Button
+          >
         </Col>
       </Row>
       <Row>
@@ -467,6 +494,8 @@ export default {
         [8, 0.3],
         [9, 0.1],
       ]),
+      openModal: false,
+      jsonoutput: "",
     };
   },
   mounted() {
@@ -477,6 +506,48 @@ export default {
   },
   beforeDestroy() {},
   methods: {
+    copyText: function (node) {
+      let textElem = this.$refs[node].$el.querySelector("textarea");
+      if (!textElem) return;
+      textElem.focus();
+      textElem.select();
+      try {
+        if (document.execCommand("copy", false, null)) {
+          this.$Notice.success({
+            title: "复制json成功",
+          });
+          textElem.blur();
+        } else {
+          this.$Notice.error({
+            title: "复制json失败",
+            desc:"您的浏览器不支持document.execCommand方法",
+          });
+        }
+      } catch (err) {
+        //fail info
+      }
+    },
+    outputJson() {
+      this.openModal = true;
+      let desCoast = window.sessionStorage.getItem("desCoast");
+      let desTY = window.sessionStorage.getItem("desTY");
+      let galeWarning = window.sessionStorage.getItem("galeWarning");
+      let localTime = window.sessionStorage.getItem("localTime");
+      let speedPicture = window.sessionStorage.getItem("speedPicture");
+      let tableData = window.sessionStorage.getItem("tableData");
+      let wavePicture = window.sessionStorage.getItem("wavePicture");
+      let jsonObj = {
+        localTime: localTime,
+        desCoast: desCoast,
+        desTY: desTY,
+        galeWarning: galeWarning,
+        tableData: JSON.parse(tableData),
+        speedPicture: JSON.parse(speedPicture),
+        wavePicture: JSON.parse(wavePicture),
+      };
+      const jsonString = JSON.stringify(jsonObj, null, 2);
+      this.jsonoutput = jsonString;
+    },
     drawData2() {
       console.log(this.initTime + " " + this.fcHour);
       const timeString = this.initTime + " " + this.fcHour; //'2017-08-22 12:00:00';
@@ -502,6 +573,7 @@ export default {
         i,
         maxValue,
       ]);
+      this.setStorage("speedPicture", JSON.stringify(data));
       // data.max = Math.max(...data.map(v=>v[0]));
       // console.log('绘制');
       // const myChart = echarts.init(document.getElementById('e-chart2'), null, {renderer: 'svg'});
@@ -593,6 +665,7 @@ export default {
         i,
         maxValue,
       ]);
+      this.setStorage("wavePicture", JSON.stringify(data));
       const myChart = echarts.init(document.getElementById("e-chart3"));
       var option = {
         title: {
@@ -832,6 +905,7 @@ export default {
           this.drawData2();
           this.drawData3();
           this.galeWarning = this.getGaleWarning();
+          this.setStorage("galeWarning", this.galeWarning);
         })
         .catch((err) => {
           console.error(err);
@@ -901,12 +975,17 @@ export default {
         .then((res) => {
           let desString = res.data;
           this.desTY = desString.tyString;
+          this.setStorage("desTY", this.desTY);
           // this.desEN = desString.enString;
           this.desCoast = desString.coastString;
+          this.setStorage("desCoast", this.desCoast);
         })
         .catch((err) => {
           console.error(err);
         });
+    },
+    setStorage(name, value) {
+      sessionStorage.setItem(name, value);
     },
     changeDate(date, whichDate) {
       if (whichDate == "modelDate") {
@@ -1069,7 +1148,8 @@ export default {
         // console.log(waveFit);
         //console.log(wind10m);
         let averageHeight = waveFit ? waveFit.AverageWaveHeight : 0;
-        let averageHeightClassName = Number(averageHeight)>=1.5? 'red-cell':'green-cell';
+        let averageHeightClassName =
+          Number(averageHeight) >= 1.5 ? "red-cell" : "green-cell";
         let swellDir = (windDir / Math.PI) * 180 + 15;
         if (swellDir > 360) swellDir = swellDir - 360;
         let swellH = waveFit ? Number(waveFit.SurgeHeight) : 0;
@@ -1129,7 +1209,7 @@ export default {
           cloud,
           weather,
           cellClassName: {
-            'waveH': averageHeightClassName,
+            waveH: averageHeightClassName,
           },
         };
         // console.log(colo);
@@ -1140,9 +1220,12 @@ export default {
     localTime() {
       const timeString = this.initTime + " " + this.fcHour; //'2017-08-22 12:00:00';
       let iTime = moment(timeString, "YYYY-MM-DD HH:mm:ss").add(8, "hours");
+      let storeTimeString = moment(iTime).format("YYDDMMHH");
+      this.setStorage("localTime", storeTimeString);
       return [
         moment(iTime).format("北京时 YYYY年MM月DD日HH:mm"),
         moment(iTime.add(1, "hours")).format("YYYY年MM月DD日HH:mm"),
+        storeTimeString,
       ];
     },
     /**模式与预报时间的差值*/
@@ -1222,6 +1305,7 @@ export default {
       this.changeTitle();
     },
     tableData() {
+      this.setStorage("tableData", JSON.stringify(this.tableData));
       this.drawData2();
       this.drawData3();
     },

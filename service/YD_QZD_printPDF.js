@@ -13,9 +13,9 @@ function timeout(delay) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       try {
-          resolve(1)
+        resolve(1)
       } catch (e) {
-          reject(0)
+        reject(0)
       }
     }, delay)
   })
@@ -23,60 +23,60 @@ function timeout(delay) {
 
 const baseUrl = 'http://10.148.16.20:10101';
 
-function getTime(){
+function getTime() {
   let nowDate = moment(new Date());
   let nowHour = nowDate.hour();
   let fitDate;
   let fitHour;
   let modelInitDate, modelFcHour;
   let timeConfig = {
-    yearmonth:'201901',
-    day:1,
-    hour:20,
-    fileTime:'2019010108',
+    yearmonth: '201901',
+    day: 1,
+    hour: 20,
+    fileTime: '2019010108',
   }
   //nowHour = 4;
-  if(nowHour>=14&&nowHour<21){
+  if (nowHour >= 14 && nowHour < 21) {
     fitHour = '12:00:00';
     fitDate = moment(nowDate).hour(12);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
-    timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    timeConfig.fileTime = fitDate.add(8, 'hours').format('YYMMDDHH');
     modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
     modelFcHour = "12:00:00";
   }
-  else if(nowHour>=21){
+  else if (nowHour >= 21) {
     fitHour = '00:00:00';
-    fitDate = moment(nowDate).add(1,'days').hour(0);
+    fitDate = moment(nowDate).add(1, 'days').hour(0);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
-    timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    timeConfig.fileTime = fitDate.add(8, 'hours').format('YYMMDDHH');
     modelInitDate = moment(nowDate).format("YYYY-MM-DD");
     modelFcHour = "00:00:00";
   }
-  else if(nowHour<9){
+  else if (nowHour < 9) {
     fitHour = '00:00:00';
     fitDate = moment(nowDate).hour(0);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
-    timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    timeConfig.fileTime = fitDate.add(8, 'hours').format('YYMMDDHH');
     modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
     modelFcHour = "12:00:00";
   }
-  else if(nowHour<14&&nowHour>=9){
+  else if (nowHour < 14 && nowHour >= 9) {
     fitHour = '06:00:00';
     fitDate = moment(nowDate).hour(6);
     timeConfig.yearmonth = fitDate.format('YYYYMM');
     timeConfig.day = fitDate.date();
     timeConfig.hour = fitDate.hours();
-    timeConfig.fileTime = fitDate.add(8,'hours').format('YYMMDDHH');
+    timeConfig.fileTime = fitDate.add(8, 'hours').format('YYMMDDHH');
     modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
     modelFcHour = "12:00:00";
   }
-  else{
+  else {
     '';
   }
   timeConfig.fitHour = fitHour;
@@ -93,8 +93,8 @@ function getTime(){
 
 
 
-async function main (timeConfig=getTime()) {
-  try{
+async function main(timeConfig = getTime()) {
+  try {
     let sDate = timeConfig.modelInitDate;
     let sTime = timeConfig.modelFcHour;
     // let fcHrLenth = moment(`${this.modelInitDate} `)
@@ -113,31 +113,31 @@ async function main (timeConfig=getTime()) {
     if (data.DATA.length == 0) {
 
       throw new Error('此时次模式数据为空,请等待更新');
-    }else{
+    } else {
       console.log('数据中心数据接口测试完成，准备生成数据');
     }
-  }catch(err){
+  } catch (err) {
     console.log('数据中心数据接口异常，请注意是否有数据生成');
     console.error(err);
   }
-  try{
+  try {
     //const timeConfig = getTime();
     const fitName = 'YDQZD-hourly';
     const fileName = `${fitName}-${timeConfig.fileTime}.pdf`;
     const imgName = `${fitName}-${timeConfig.fileTime}.jpg`;
-    
+
     const pdfConfig = {
       //displayHeaderFooter: true,
       // headerTemplate: '<p class="pageNumber">GDMO</p>',
       //footerTemplate:'<span class="pageNumber"></span>',
-      margin: { 
-        top: "10px", 
+      margin: {
+        top: "10px",
         bottom: "20px",
-        left:'30px',
-        right:'30px',
+        left: '30px',
+        right: '30px',
       },
-      path: path.resolve(__dirname,'pdf/'+fileName),
-      format:'A4',
+      path: path.resolve(__dirname, 'pdf/' + fileName),
+      format: 'A4',
       printBackground: true,
       //width:'21cm'
       //scale 0.1到2之间
@@ -160,61 +160,103 @@ async function main (timeConfig=getTime()) {
     });
     console.log('喝杯茶，等待20秒数据中心接口回传');
     await timeout(20000);
-    
-    console.log('正在生成PDF '+fileName);
+
+
+
+    console.log('正在生成PDF ' + fileName);
     await page.pdf(pdfConfig);
     // 外链
-    pdfConfig.path = '//10.148.16.32/e/ssow/email/'+fileName;
+    pdfConfig.path = '//10.148.16.32/e/ssow/email/' + fileName;
     await page.pdf(pdfConfig);
     console.log('PDF生成完成');
 
     // await page.setViewport({
     //   width: 1920, height: 1080,
     // });
-    console.log('正在生成HTML '+imgName);
+    console.log('正在生成HTML ' + imgName);
 
-    await page.screenshot({path: path.resolve(__dirname,'html/'+imgName),fullPage: true});
-    await page.screenshot({path: path.resolve(__dirname,'html/'+fitName+'.jpg'),fullPage: true});
+    await page.screenshot({ path: path.resolve(__dirname, 'html/' + imgName), fullPage: true });
+    await page.screenshot({ path: path.resolve(__dirname, 'html/' + fitName + '.jpg'), fullPage: true });
     //await page.screenshot({path: path.resolve(__dirname,`html/ENI${timeConfig.fileTime}.jpg`),fullPage: true});
-    
-    ejsHTML({imgSrc:fitName+'.jpg'})
-    .then(html=>{
-      fs.writeFile(path.resolve(__dirname,'html/'+fitName+'.html'), html, (err)=>{if (err) {
-        return console.error(err);
-      }});
-    });
-    ejsHTML({imgSrc:imgName})
-    .then(html=>{
-      fs.writeFile(path.resolve(__dirname,`html/${fitName}${timeConfig.fileTime}.html`), html, (err)=>{if (err) {
-        return console.error(err);
-      }});
-    });
+
+    ejsHTML({ imgSrc: fitName + '.jpg' })
+      .then(html => {
+        fs.writeFile(path.resolve(__dirname, 'html/' + fitName + '.html'), html, (err) => {
+          if (err) {
+            return console.error(err);
+          }
+        });
+      });
+    ejsHTML({ imgSrc: imgName })
+      .then(html => {
+        fs.writeFile(path.resolve(__dirname, `html/${fitName}${timeConfig.fileTime}.html`), html, (err) => {
+          if (err) {
+            return console.error(err);
+          }
+        });
+      });
     //外链
 
-    await page.screenshot({path: '//10.148.16.32/e/ssow/html/'+imgName,fullPage: true});
-    await page.screenshot({path:  '//10.148.16.32/e/ssow/html/'+fitName+'.jpg',fullPage: true});
-    ejsHTML({imgSrc:fitName+'.jpg'})
-    .then(html=>{
-      fs.writeFile('//10.148.16.32/e/ssow/html/'+`${fitName}.html`, html, (err)=>{if (err) {
-        return console.error(err);
-      }});
+    await page.screenshot({ path: '//10.148.16.32/e/ssow/html/' + imgName, fullPage: true });
+    await page.screenshot({ path: '//10.148.16.32/e/ssow/html/' + fitName + '.jpg', fullPage: true });
+    ejsHTML({ imgSrc: fitName + '.jpg' })
+      .then(html => {
+        fs.writeFile('//10.148.16.32/e/ssow/html/' + `${fitName}.html`, html, (err) => {
+          if (err) {
+            return console.error(err);
+          }
+        });
+      });
+    ejsHTML({ imgSrc: imgName })
+      .then(html => {
+        fs.writeFile('//10.148.16.32/e/ssow/html/' + `${fitName}${timeConfig.fileTime}.html`, html, (err) => {
+          if (err) {
+            return console.error(err);
+          }
+        });
+      });
+
+    console.log('生成JSON文件')
+    let jsonRaw = await page.evaluate(() => {
+      let desCoast = window.sessionStorage.getItem('desCoast');
+      let desTY = window.sessionStorage.getItem('desTY');
+      let galeWarning = window.sessionStorage.getItem('galeWarning');
+      let localTime = window.sessionStorage.getItem('localTime');
+      let speedPicture = window.sessionStorage.getItem('speedPicture');
+      let tableData = window.sessionStorage.getItem('tableData');
+      let wavePicture = window.sessionStorage.getItem('wavePicture');
+      let jsonObj = {
+        localTime: localTime,
+        desCoast: desCoast,
+        desTY: desTY,
+        galeWarning: galeWarning,
+        tableData: JSON.parse(tableData),
+        speedPicture: JSON.parse(speedPicture),
+        wavePicture: JSON.parse(wavePicture),
+      }
+      const jsonString = JSON.stringify(jsonObj, null, 2);
+      return jsonString;
     });
-    ejsHTML({imgSrc:imgName})
-    .then(html=>{
-      fs.writeFile('//10.148.16.32/e/ssow/html/'+`${fitName}${timeConfig.fileTime}.html`, html, (err)=>{if (err) {
+    fs.writeFile('//10.148.16.32/e/ssow/html/' + `${fitName}.json`, jsonRaw, (err) => {
+      if (err) {
         return console.error(err);
-      }});
+      }
     });
-    
+    fs.writeFile('//10.148.16.32/e/ssow/html/' + `${fitName}-${timeConfig.fileTime}.json`, jsonRaw, (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+
     // let openDir = path.dirname(path.resolve(__dirname,'pdf/'+fileName));
     // console.log(openDir);
     // spawn('explorer.exe', [openDir]);
     spawn('explorer.exe', ['\\\\10.148.16.32\\e\\ssow\\html\\']);
-    console.log('打开资源管理器'); 
-    
+    console.log('打开资源管理器');
+
     await browser.close();
   }
-  catch(err){
+  catch (err) {
     throw err;
   }
 }
@@ -224,9 +266,9 @@ exports.printPDF = main;
 if (require.main === module) {
   console.log('called directly');
   main()
-  .catch(err=>{
-    console.error(err);
-  });
+    .catch(err => {
+      console.error(err);
+    });
 } else {
   console.log('required as a module');
 }
