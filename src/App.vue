@@ -3,7 +3,7 @@
     <Modal
       v-model="openModal"
       title="导出的JSON文件"
-      @on-ok="确认"
+      @on-ok="确认;"
       @on-cancel="取消;"
     >
       <Input
@@ -13,13 +13,26 @@
         type="textarea"
         placeholder="Enter something..."
       />
-      <Button type="primary" icon="ios-search" @click="copyText('textJson')"
-            >复制JSON到剪贴板</Button
-          >
+      <Button type="primary" icon="copy-outline" @click="copyText('textJson')"
+        >复制JSON到剪贴板</Button
+      >
       <div>
-        文件名<br>
-        YDQZD-hourly.json<br>
-        YDQZD-hourly-{{localTime[2]}}.json
+        下载json文件<br />
+        <Button
+          type="primary"
+          icon="download-outlineh"
+          @click="downloadFile('YDQZD-hourly.json', jsonoutput)"
+          >YDQZD-hourly.json</Button
+        >
+        <br /><br />
+        <Button
+          type="primary"
+          icon="download-outline"
+          @click="
+            downloadFile('YDQZD-hourly-' + localTime[2] + '.json', jsonoutput)
+          "
+          >YDQZD-hourly-{{ localTime[2] }}.json</Button
+        >
       </div>
     </Modal>
     <div class="show-control" v-show="showControl">
@@ -138,7 +151,7 @@
           />
         </Col>
         <Col span="3">
-          <Button type="primary" icon="ios-search" @click="outputJson"
+          <Button type="primary" icon="push-outline" @click="outputJson"
             >导出JSON</Button
           >
         </Col>
@@ -520,7 +533,7 @@ export default {
         } else {
           this.$Notice.error({
             title: "复制json失败",
-            desc:"您的浏览器不支持document.execCommand方法",
+            desc: "您的浏览器不支持document.execCommand方法",
           });
         }
       } catch (err) {
@@ -1070,6 +1083,21 @@ export default {
         }
         return output;
       };
+    },
+    downloadFile(fileName, content) {
+      var pom = document.createElement("a");
+      pom.setAttribute(
+        "href",
+        "data:text/plain;charset=utf-8," + encodeURIComponent(content)
+      );
+      pom.setAttribute("download", fileName);
+      if (document.createEvent) {
+        var event = document.createEvent("MouseEvents");
+        event.initEvent("click", true, true);
+        pom.dispatchEvent(event);
+      } else {
+        pom.click();
+      }
     },
   },
   computed: {
