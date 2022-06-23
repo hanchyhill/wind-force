@@ -170,7 +170,7 @@
           <img src="/logocact.gif" id="logo" />
 
           <div class="email-to">
-            <h1>粤电-青州岛风电场海洋气象预报</h1>
+            <h1>粤电-青洲风电场海洋气象预报</h1>
             <!-- 传送： 徐闻绿色建材有限公司<br /> -->
             <!--（ 北纬21度26分49秒，东经112度10分05秒）<br>
             
@@ -1024,7 +1024,7 @@ export default {
         }, () => { console.log('finish!'); }); */
     },
     changeTitle() {
-      document.title = `GDMO 粤电-青州岛${this.initTime} ${this.fcHour}`;
+      document.title = `GDMO 粤电-青洲岛${this.initTime} ${this.fcHour}`;
     },
     getGaleWarning() {
       if (!this.tableData.length || this.tableData.length < 6) return "";
