@@ -1248,7 +1248,7 @@ export default {
     localTime() {
       const timeString = this.initTime + " " + this.fcHour; //'2017-08-22 12:00:00';
       let iTime = moment(timeString, "YYYY-MM-DD HH:mm:ss").add(8, "hours");
-      let storeTimeString = moment(iTime).format("YYDDMMHH");
+      let storeTimeString = moment(iTime).format("YYMMDDHH");
       this.setStorage("localTime", storeTimeString);
       return [
         moment(iTime).format("北京时 YYYY年MM月DD日HH:mm"),
