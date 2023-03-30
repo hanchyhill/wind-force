@@ -33,8 +33,8 @@
             >
           </Select>
         </Col>
-        <Col span="3">
-          <Select v-model="selectedModel" style="width: 100px">
+        <Col span="4">
+          <Select v-model="selectedModel" style="width: 150px">
             <Option
               v-for="item in modelList"
               :value="item.value"
@@ -43,7 +43,7 @@
             >
           </Select>
         </Col>
-        <Col span="3">
+        <Col span="2">
           <Button type="primary" icon="ios-search" @click="searchData"
             >搜索模式</Button
           >
@@ -443,6 +443,9 @@ export default {
         { label: "GIFT海洋", value: "giftoceanzd" },
         { label: "EC逐小时", value: "ecmwf_s2s" },
         { label: "EC三小时", value: "ecmwfthin" },
+        { label: "CMA-GD-ec", value: "gtrams3km_ec" },
+        { label: "CMA-GD-cngragfs", value: "gtrams3km_cngragfs" },
+        { label: "CMA-GD-ncep", value: "gtrams3km_ncep" },
       ],
       modelParams: {
         giftoceanzd: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
@@ -825,10 +828,18 @@ export default {
         .then((series) => {
           this.v10m = series.v10m;
           this.u10m = series.u10m;
-          this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
-          this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
-          this.cloud = series.tcco;
-          this.rainHr = series.tppm.map((v) => [v[0] * 1000.0, v[1]]);
+          if(this.selectedModel == 'giftoceanzd'){
+            this.t2m = series.t2mm.map((v) => [v[0], v[1]]);
+            this.cloud = series.tcco.map((v) => [v[0]/10.0, v[1]]);
+            this.vis = series.visi;
+            this.rainHr = series.tppm.map((v) => [v[0], v[1]]);
+          }else{
+            this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
+            this.cloud = series.tcco;
+            this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
+            this.rainHr = series.tppm.map((v) => [v[0] * 1000.0, v[1]]);
+          }
+          
           this.drawData2();
           this.drawData3();
           this.galeWarning = this.getGaleWarning();
@@ -1176,11 +1187,11 @@ export default {
       const cloudState = this.cloud.map((data) => {
         const iCloud = data[0];
         let state;
-        if (iCloud < 0.4) {
+        if (iCloud < 0.39) {
           state = "晴";
         } else if (iCloud < 0.8) {
           state = "多云";
-        } else if (iCloud < 0.99) {
+        } else if (iCloud < 0.90) {
           state = "多云";
         } else {
           state = "阴";
