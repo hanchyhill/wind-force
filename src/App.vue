@@ -918,14 +918,15 @@ export default {
           this.u10m = series.u10m;
           if(this.selectedModel == 'giftoceanzd'){
             this.t2m = series.t2mm.map((v) => [v[0], v[1]]);
-            this.cloud = series.tcco.map((v) => [v[0]/100.0, v[1]]);
+            this.cloud = series.tcco.map((v) => [v[0]/10.0, v[1]]);
             this.vis = series.visi;
+            this.rainHr = series.tppm.map((v) => [v[0], v[1]]);
           }else{
             this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
             this.cloud = series.tcco;
             this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
+            this.rainHr = series.tppm.map((v) => [v[0] * 1000.0, v[1]]);
           }
-          this.rainHr = series.tppm.map((v) => [v[0] * 1000.0, v[1]]);
           this.drawData2();
           this.drawData3();
           this.galeWarning = this.getGaleWarning();
