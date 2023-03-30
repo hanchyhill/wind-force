@@ -34,7 +34,7 @@
           </Select>
         </Col>
         <Col span="3">
-          <Select v-model="selectedModel" style="width: 100px">
+          <Select v-model="selectedModel" style="width: 150px">
             <Option
               v-for="item in modelList"
               :value="item.value"
@@ -442,6 +442,10 @@ export default {
         { label: "GIFT海洋", value: "giftoceanzd" },
         { label: "EC逐小时", value: "ecmwf_s2s" },
         { label: "EC三小时", value: "ecmwfthin" },
+        // { label: "CMA-GD-cnec", value: "gtrams3km_cnec" },
+        { label: "CMA-GD-ec", value: "gtrams3km_ec" },
+        { label: "CMA-GD-cngragfs", value: "gtrams3km_cngragfs" },
+        { label: "CMA-GD-ncep", value: "gtrams3km_ncep" },
       ],
       modelParams: {
         giftoceanzd: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
@@ -824,9 +828,15 @@ export default {
         .then((series) => {
           this.v10m = series.v10m;
           this.u10m = series.u10m;
-          this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
-          this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
-          this.cloud = series.tcco;
+          if(this.selectedModel == 'giftoceanzd'){
+            this.t2m = series.t2mm.map((v) => [v[0], v[1]]);
+            this.cloud = series.tcco.map((v) => [v[0]/100.0, v[1]]);
+            this.vis = series.visi;
+          }else{
+            this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
+            this.cloud = series.tcco;
+            this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
+          }
           this.rainHr = series.tppm.map((v) => [v[0] * 1000.0, v[1]]);
           this.drawData2();
           this.drawData3();
