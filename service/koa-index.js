@@ -40,7 +40,7 @@ router.get('/api',async(ctx,next)=>{
     const res = await axios.get(url);
     
     ctx.body = res.data;
-  }if(ctx.query.interface=='getHourlyElems'){
+  }if(ctx.query.interface=='getHourlyElems'){// 逐小时预报数据获取
     const elements = ctx.query.elements;
     const starttime = ctx.query.starttime;
     const endtime = ctx.query.endtime;
@@ -65,7 +65,7 @@ router.get('/api',async(ctx,next)=>{
     }else{
       ctx.body = res.data;
     }
-  }else if(ctx.query.interface=='getDes'){
+  }else if(ctx.query.interface=='getDes'){// 获取词条描述
     const dateString = ctx.query.dateString;
     //201812270800
     let desString = await getDes(dateString);

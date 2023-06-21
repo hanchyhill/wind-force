@@ -5,26 +5,45 @@
 ## Project setup
 
 ```
-yarn install
+npm install
 ```
 
 ### Compiles and hot-reloads for development
 
 ```
-yarn run serve
+npm run serve
 ```
 
 ### Compiles and minifies for production
 
 ```
-yarn run build
+npm run build
 ```
 
-### Lints and fixes files
+## 前端代码主程序
+./src/App.vue
+### 主要函数说明
+searchData 检索数据
+getElemsHourly 获取逐小时数据
+getGaleWarning 判断是否提示大风预警
+drawData2 绘制图像
+drawData3 绘制图像
+outputJson 输出json
+speed 风速换算
+tableData 生成表格数据
+weatherArr 天气现象转换
 
-```
-yarn run lint
-```
+
+## 后端API
+./service/koa-index.js
+### 接口：
+1. getHourlyElems
+获取IDEA接口数据，并插值成逐小时数据
+2. getDes
+获取词条描述
+
+## 生成PDF
+./service/*_printPDF.js *代表不同站点的PDF
 
 ### 小时降水量换算
 
@@ -41,3 +60,6 @@ yarn run lint
 7-9.5 多云
 9.5-9.8 多云到阴天
 9.9-10 阴天
+
+### 深水区风浪关系表
+./src/windwavelist.json
