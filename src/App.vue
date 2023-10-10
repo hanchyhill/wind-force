@@ -751,6 +751,7 @@ export default {
       this.getDes(desTime);
     },
     searchData() {
+      this.$Message.info("正在搜索");
       let sDate = this.modelInitDate;
       let sTime = this.modelFcHour;
       // let fcHrLenth = moment(`${this.modelInitDate} `)
@@ -803,6 +804,7 @@ export default {
           if (data.DATA.length == 0) {
             // console.error("此时次数据为空,请等待更新");
             // showNotification('此时次数据为空,请等待更新');
+            this.$Message.error("此时次数据为空,请等待更新");
             throw new Error("此时次数据为空,请等待更新");
           } else {
             const eleLenth = Number.parseInt(data.DATA.length / elems.length);
@@ -828,12 +830,12 @@ export default {
         .then((series) => {
           this.v10m = series.v10m;
           this.u10m = series.u10m;
-          if(this.selectedModel == 'giftoceanzd'){
+          if (this.selectedModel == "giftoceanzd") {
             this.t2m = series.t2mm.map((v) => [v[0], v[1]]);
-            this.cloud = series.tcco.map((v) => [v[0]/10.0, v[1]]);
+            this.cloud = series.tcco.map((v) => [v[0] / 10.0, v[1]]);
             this.vis = series.visi;
             this.rainHr = series.tppm.map((v) => [v[0], v[1]]);
-          }else{
+          } else {
             this.t2m = series.t2mm.map((v) => [v[0] - 273.15, v[1]]);
             this.cloud = series.tcco;
             this.vis = series.visi.map((v) => [v[0] / 1000.0, v[1]]);
@@ -1006,6 +1008,11 @@ export default {
   computed: {
     speed() {
       let speed = [];
+      if (this.u10m.length != this.v10m.length) {
+        console.error("u10m和v10m长度不同");
+        this.$Message.error("u10m和v10m长度不同");
+        return [];
+      }
       for (let i = 0; i < this.v10m.length; i++) {
         let u10 = this.u10m[i][0];
         let v10 = this.v10m[i][0];
@@ -1034,6 +1041,11 @@ export default {
       this.visCompressRatio.forEach((ratio, time) => {
         compressorsMap.set(time, this.Compressor(10, ratio));
       }); // 设置压缩比
+      if (this.u10m.length != this.v10m.length) {
+        console.error("u10m和v10m长度不同");
+        this.$Message.error("u10m和v10m长度不同");
+        return [];
+      }
       let data = this.v10m.map((v, i) => {
         let fTime = moment(startTime).add(this.v10m[i][1], "hours");
         let fHour = fTime.hour();
@@ -1079,7 +1091,8 @@ export default {
         // console.log(waveFit);
         //console.log(wind10m);
         let averageHeight = waveFit ? waveFit.AverageWaveHeight : 0;
-        let averageHeightClassName = Number(averageHeight)>=1.5? 'red-cell':'green-cell';
+        let averageHeightClassName =
+          Number(averageHeight) >= 1.5 ? "red-cell" : "green-cell";
         let swellDir = (windDir / Math.PI) * 180 + 15;
         if (swellDir > 360) swellDir = swellDir - 360;
         let swellH = waveFit ? Number(waveFit.SurgeHeight) : 0;
@@ -1139,7 +1152,7 @@ export default {
           cloud,
           weather,
           cellClassName: {
-            'waveH': averageHeightClassName,
+            waveH: averageHeightClassName,
           },
         };
         // console.log(colo);
@@ -1328,11 +1341,13 @@ h2 {
   color: red;
 }
 
-.ivu-table .green-cell, .ivu-table .green-cell .ivu-table-cell{
+.ivu-table .green-cell,
+.ivu-table .green-cell .ivu-table-cell {
   background-color: #13cf32;
   color: #fff;
 }
-.ivu-table .red-cell, .ivu-table .red-cell .ivu-table-cell{
+.ivu-table .red-cell,
+.ivu-table .red-cell .ivu-table-cell {
   background-color: #b91c1c;
   color: #fff;
 }
