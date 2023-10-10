@@ -165,7 +165,7 @@
 
     <div id="main-content" contenteditable="true">
       <div class="page-frame">
-        <div class="header" @click="showControl = !showControl">
+        <div class="header" @click="showControl=!showControl">
           <hr />
           <img src="/logocact.gif" id="logo" />
 
@@ -838,6 +838,7 @@ export default {
       this.getDes(desTime);
     },
     searchData() {
+      this.$Message.info('正在搜索');
       let sDate = this.modelInitDate;
       let sTime = this.modelFcHour;
       // let fcHrLenth = moment(`${this.modelInitDate} `)
@@ -889,7 +890,7 @@ export default {
           let data = res.data;
           if (data.DATA.length == 0) {
             // console.error("此时次数据为空,请等待更新");
-            // showNotification('此时次数据为空,请等待更新');
+            this.$Message.error('此时次数据为空,请等待更新');
             throw new Error("此时次数据为空,请等待更新");
           } else {
             const eleLenth = Number.parseInt(data.DATA.length / elems.length);
@@ -1115,6 +1116,11 @@ export default {
   computed: {
     speed() {
       let speed = [];
+      if(this.u10m.length !=this.v10m.length){
+        console.error('u10m和v10m长度不同');
+        this.$Message.error('u10m和v10m长度不同');
+        return [];
+      }
       for (let i = 0; i < this.v10m.length; i++) {
         let u10 = this.u10m[i][0];
         let v10 = this.v10m[i][0];
@@ -1143,6 +1149,12 @@ export default {
       this.visCompressRatio.forEach((ratio, time) => {
         compressorsMap.set(time, this.Compressor(10, ratio));
       }); // 设置压缩比
+
+      if(this.u10m.length !=this.v10m.length){
+        console.error('u10m和v10m长度不同');
+        // this.$Message.error('u10m和v10m长度不同');
+        return [];
+      }
       let data = this.v10m.map((v, i) => {
         let fTime = moment(startTime).add(this.v10m[i][1], "hours");
         let fHour = fTime.hour();
