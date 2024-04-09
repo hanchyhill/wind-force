@@ -34,9 +34,8 @@ router.get('/api',async(ctx,next)=>{
     const lon = ctx.query.lon;
     const lat = ctx.query.lat;
     const modelid = ctx.query.modelid;
-    const url = `http://10.148.90.120:28088/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
-    //`http://10.148.90.120:28088/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
-    // `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
+    const url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
+    `http://10.148.90.120:28088/di/http.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetDataTimeSerial&modelid=${modelid}&element=${elemnet}&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
     // http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwf_s2s&element=u10m v10m t2mm visi tppm tcco&level=0&starttime=2020-06-15 12:00:00&endtime=2020-06-17 12:00:00&lon=112.25&lat=21.5
     console.log(url);
     const res = await axios.get(url);
@@ -49,19 +48,14 @@ router.get('/api',async(ctx,next)=>{
     const lon = ctx.query.lon;
     const lat = ctx.query.lat;
     const modelid = ctx.query.modelid;
-    let url = `http://10.148.90.120:28088/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
-    if(modelid == 'ecmwf_s2s' || modelid == 'ecmwfthin' ){
-
-    }else if(modelid == 'giftoceanzd'){
-      url = `http://10.148.90.120:28088/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=u10m v10m t2mm visi rain clct&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
-    }else if(modelid == 'gtrams3km_cnec' || modelid == 'gtrams3km_ec' || modelid == 'gtrams3km_cngragfs' || modelid ==  'gtrams3km_ncep'){
-      url = `http://10.148.90.120:28088/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=u10m v10m t2mm visi cpre tcdc&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
-    }
+    const url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
+    `http://10.148.90.120:28088/di/http.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}&serviceNodeId=GMODC_MUSIC_MI_1`;
+    //           http://172.22.1.175/di/grid.action?userId=sqxt&pwd=shengqxt123&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=ecmwf_s2s&element=u10m v10m t2mm visi tppm tcco&level=0&starttime=2020-06-15 12:00:00&endtime=2020-06-17 12:00:00&lon=112.25&lat=21.5
     console.log(url);
     const res = await axios.get(url);
     
     let info = res.data;
-    if(['ecmwfthin','gtrams3km_cngragfs','gtrams3km_ncep','giftoceanzd'].includes(modelid)){
+    if(modelid=='ecmwfthin'){
       if(info.DATA) info.DATA = interploteData(info.DATA);
       ctx.body = res.data = info;
     }else{
