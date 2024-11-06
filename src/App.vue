@@ -291,6 +291,7 @@ export default {
     }
     console.log(fitDate, fitHour);
     return {
+      allday:2,// 预报两天
       showControl: false,
       isCollapsed: true,
       isShift: true,
@@ -756,7 +757,7 @@ export default {
       let sTime = this.modelFcHour;
       // let fcHrLenth = moment(`${this.modelInitDate} `)
       let eDate = moment(this.initTime, "YYYY-MM-DD")
-        .add(1, "days")
+        .add(this.allday, "days")
         .format("YYYY-MM-DD");
       let eTime = this.fcHour;
       let iLon = this.lon;
@@ -819,7 +820,8 @@ export default {
             }, []); // 雨量转换
             console.log(series[4]);
             series = series.map((data) =>
-              data.filter((v) => v[1] > 0 && v[1] < 25)
+              data.filter((v) => v[1] > 0 && v[1] < 24*this.allday+1)
+              //data.filter((v) => v[1] > 0 && v[1] < 25)
             ); // 只保留24小时预报
             series = this.combineElems2Data(elems, series);
 
@@ -1065,6 +1067,13 @@ export default {
             this.windMinThreshold;
 
         let iknots = iSpeed * 1.944;
+        // let iSpeed = Math.sqrt(Math.pow(u, 2) + Math.pow(v, 2));
+        // let windDir = Math.atan2(-v, -u);  // 直接使用atan2获取从北方向顺时针的角度
+        // let dir = windDir = windDir * (180 / Math.PI);  // 转换为角度
+        // if (dir < 0) {
+        //     dir += 360;  // 调整为0到360度
+        // }
+
         let windDir = iR + Math.PI; //风的来向
         windDir = -(windDir - Math.PI / 2); //与北向的角度差
         if (windDir < 0) {
