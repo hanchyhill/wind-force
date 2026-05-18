@@ -256,38 +256,69 @@ var dims = {
 export default {
   name: "wind-fc",
   data() {
+    let initModel = "giftoceanzd";
     let nowDate = moment(new Date());
     let nowHour = nowDate.hour();
     let fitDate;
     let fitHour;
     let modelInitDate, modelFcHour;
-    //nowHour = 4;
-    if (nowHour >= 14 && nowHour < 21) {
-      // 下午预报用前一天模式12时预报
-      fitDate = moment(nowDate).hour(12).format("YYYY-MM-DD");
-      fitHour = "12:00:00";
-      modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
-      modelFcHour = "12:00:00";
-    } else if (nowHour >= 21) {
-      // 晚上用今天08时预报
-      fitDate = moment(nowDate).add(1, "days").format("YYYY-MM-DD");
-      fitHour = "00:00:00";
-      modelInitDate = moment(nowDate).format("YYYY-MM-DD");
-      modelFcHour = "00:00:00";
-    } else if (nowHour < 9) {
-      // 早晨用昨天12时预报
-      fitDate = moment(nowDate).format("YYYY-MM-DD");
-      fitHour = "00:00:00";
-      modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
-      modelFcHour = "12:00:00";
-    } else if (nowHour < 14 && nowHour >= 9) {
-      // 上午用昨天12时起报
-      fitDate = moment(nowDate).hour(6).format("YYYY-MM-DD");
-      fitHour = "06:00:00"; //'06:00:00';
-      modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
-      modelFcHour = "12:00:00";
-    } else {
-      ("");
+    if(initModel != "giftoceanzd"){
+      //nowHour = 4;
+      if (nowHour >= 14 && nowHour < 21) {
+        // 下午预报用前一天模式12时预报
+        fitDate = moment(nowDate).hour(12).format("YYYY-MM-DD");
+        fitHour = "12:00:00";
+        modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+        modelFcHour = "12:00:00";
+      } else if (nowHour >= 21) {
+        // 晚上用今天00时预报
+        fitDate = moment(nowDate).add(1, "days").format("YYYY-MM-DD");
+        fitHour = "00:00:00";
+        modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+        modelFcHour = "00:00:00";
+      } else if (nowHour < 9) {
+        // 早晨用昨天12时预报
+        fitDate = moment(nowDate).format("YYYY-MM-DD");
+        fitHour = "00:00:00";
+        modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+        modelFcHour = "12:00:00";
+      } else if (nowHour < 14 && nowHour >= 9) {
+        // 上午用昨天12时起报
+        fitDate = moment(nowDate).hour(6).format("YYYY-MM-DD");
+        fitHour = "06:00:00"; //'06:00:00';
+        modelInitDate = moment(nowDate).add(-1, "days").format("YYYY-MM-DD");
+        modelFcHour = "12:00:00";
+      } else {
+        ("");
+      }
+    }else{
+      if (nowHour >= 14 && nowHour < 21) {
+        // 下午预报用当天12时预报
+        fitDate = moment(nowDate).hour(12).format("YYYY-MM-DD");
+        fitHour = "12:00:00";
+        modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+        modelFcHour = "12:00:00";
+      } else if (nowHour >= 21) {
+        // 晚上用当天12时预报
+        fitDate = moment(nowDate).add(1, "days").format("YYYY-MM-DD");
+        fitHour = "00:00:00";
+        modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+        modelFcHour = "12:00:00";
+      } else if (nowHour < 9) {
+        // 早晨用当天00时预报
+        fitDate = moment(nowDate).format("YYYY-MM-DD");
+        fitHour = "00:00:00";
+        modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+        modelFcHour = "00:00:00";
+      } else if (nowHour < 14 && nowHour >= 9) {
+        // 上午用当天00时起报
+        fitDate = moment(nowDate).hour(6).format("YYYY-MM-DD");
+        fitHour = "06:00:00";
+        modelInitDate = moment(nowDate).format("YYYY-MM-DD");
+        modelFcHour = "00:00:00";
+      } else {
+        ("");
+      }
     }
     console.log(fitDate, fitHour);
     return {
@@ -438,7 +469,7 @@ export default {
       initTime: fitDate, //'2018-12-26',
       modelInitDate,
       modelFcHour,
-      selectedModel: "ecmwf_s2s",
+      selectedModel: initModel,
       modelList: [
         { label: "GIFT海洋", value: "giftoceanzd" },
         { label: "EC逐小时", value: "ecmwf_s2s" },
