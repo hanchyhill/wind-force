@@ -3,8 +3,8 @@
     <Modal
       v-model="openModal"
       title="导出的JSON文件"
-      @on-ok="确认;"
-      @on-cancel="取消;"
+      @on-ok="确认"
+      @on-cancel="取消"
     >
       <Input
         ref="textJson"
@@ -170,7 +170,7 @@
           <img src="/logocact.gif" id="logo" />
 
           <div class="email-to">
-            <h1>粤电-青洲风电场海洋气象预报</h1>
+            <h1>阳江帆石二风电海洋气象预报</h1>
             <!-- 传送： 徐闻绿色建材有限公司<br /> -->
             <!--（ 北纬21度26分49秒，东经112度10分05秒）<br>
             
@@ -473,8 +473,8 @@ export default {
         { label: "14", value: "06:00:00" },
         { label: "20", value: "12:00:00" },
       ],
-      lon: 111.625,
-      lat: 21.0,
+      lon: 112.244,
+      lat: 21.007,
       initTime: fitDate, //'2018-12-26',
       modelInitDate,
       modelFcHour,
@@ -483,6 +483,7 @@ export default {
         { label: "GIFT海洋", value: "giftoceanzd" },
         { label: "EC逐小时", value: "ecmwf_s2s" },
         { label: "EC三小时", value: "ecmwfthin" },
+        { label: "EC_S2D", value: "ecmwf_s2d" },
         // { label: "CMA-GD-cnec", value: "gtrams3km_cnec" },
         { label: "CMA-GD-ec", value: "gtrams3km_ec" },
         { label: "CMA-GD-cngragfs", value: "gtrams3km_cngragfs" },
@@ -493,6 +494,7 @@ export default {
         ocbu_scmoc: { u10m: "u10m", v10m: "v10m" },
         ecmwfthin: { u10m: "u10m", v10m: "v10m" },
         ecmwf_s2s: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
+        ecmwf_s2d: { u10m: "u10m", v10m: "v10m", vis: "visi", t2m: "t2mm" },
       },
       visCompressRatio: new Map([
         [19, 0.1],

@@ -48,7 +48,7 @@ router.get('/api',async(ctx,next)=>{
     const lat = ctx.query.lat;
     const modelid = ctx.query.modelid;
     let url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=${elements}&level=0&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
-    if(modelid == 'ecmwf_s2s' || modelid == 'ecmwfthin' ){
+    if(modelid == 'ecmwf_s2s' || modelid == 'ecmwfthin' || modelid == 'ecmwf_s2d'){
 
     }else if(modelid == 'giftoceanzd'){
       url = `http://172.22.1.175/di/grid.action?userId=${ideaConfig.username}&pwd=${ideaConfig.password}&dataFormat=json&interfaceId=intGetMultElesDataTimeSerial&modelid=${modelid}&element=u10m v10m t2mm visi rain clct&level=1000&starttime=${starttime}&endtime=${endtime}&lon=${lon}&lat=${lat}`;
@@ -59,7 +59,7 @@ router.get('/api',async(ctx,next)=>{
     const res = await axios.get(url);
     
     let info = res.data;
-    if(['ecmwfthin','gtrams3km_cngragfs','gtrams3km_ncep','giftoceanzd'].includes(modelid)){
+    if(['ecmwfthin','ecmwf_s2d','gtrams3km_cngragfs','gtrams3km_ncep','giftoceanzd'].includes(modelid)){
       if(info.DATA) info.DATA = interploteData(info.DATA);
       ctx.body = res.data = info;
     }else{
