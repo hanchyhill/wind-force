@@ -322,7 +322,7 @@ export default {
     }
     console.log(fitDate, fitHour);
     return {
-      allday:2,// 预报两天
+      forecastHours: 36,
       showControl: false,
       isCollapsed: true,
       isShift: true,
@@ -787,10 +787,12 @@ export default {
       let sDate = this.modelInitDate;
       let sTime = this.modelFcHour;
       // let fcHrLenth = moment(`${this.modelInitDate} `)
-      let eDate = moment(this.initTime, "YYYY-MM-DD")
-        .add(this.allday, "days")
-        .format("YYYY-MM-DD");
-      let eTime = this.fcHour;
+      const forecastEndTime = moment(
+        this.initTime + this.fcHour,
+        "YYYY-MM-DDHH:mm:ss"
+      ).add(this.forecastHours, "hours");
+      let eDate = forecastEndTime.format("YYYY-MM-DD");
+      let eTime = forecastEndTime.format("HH:mm:ss");
       let iLon = this.lon;
       let iLat = this.lat;
       let iModel = this.selectedModel;
@@ -851,9 +853,9 @@ export default {
             }, []); // 雨量转换
             console.log(series[4]);
             series = series.map((data) =>
-              data.filter((v) => v[1] > 0 && v[1] < 24*this.allday+1)
+              data.filter((v) => v[1] > 0 && v[1] <= this.forecastHours)
               //data.filter((v) => v[1] > 0 && v[1] < 25)
-            ); // 只保留24小时预报
+            ); // 只保留指定时效预报
             series = this.combineElems2Data(elems, series);
 
             return series;
